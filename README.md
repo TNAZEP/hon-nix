@@ -1,4 +1,4 @@
-# 本-ニクス (hon-nix)
+# 本ーニクス (hon-nix)
 
 A modular, flake-based NixOS configuration designed for stability and ease of use. Managed with **Nix Flakes** and **Home Manager**.
 
