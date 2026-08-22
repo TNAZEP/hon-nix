@@ -1,3 +1,7 @@
+# DISCLAIMER
+
+THIS BRANCH (KOUSHIN), IS A WIP REWRITE TO THE CONFIG, EXPECT BREAKAGE UNTIL IT IS MERGED TO MAIN
+
 # 本ーニクス (hon-nix)
 
 A modular, flake-based NixOS configuration designed for stability and ease of use. Managed with **Nix Flakes** and **Home Manager**.
