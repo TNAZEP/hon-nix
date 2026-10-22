@@ -1,8 +1,8 @@
 {
-  description = "Shin-NixOS Configuration";
+  description = "hon-nix: a NixOS workstation configuration";
 
   inputs = {
-    nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-25.11";
+    nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-26.05";
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
 
     home-manager = {
@@ -15,11 +15,9 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    hyprland.url = "github:hyprwm/Hyprland";
-
-    split-monitor-workspaces = {
-      url = "github:Duckonaut/split-monitor-workspaces";
-      inputs.hyprland.follows = "hyprland";
+    hyprland = {
+      url = "github:hyprwm/Hyprland/v0.56.2";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     flake-parts.url = "github:hercules-ci/flake-parts";
@@ -34,6 +32,23 @@
       ];
       imports = [
         (inputs.import-tree ./modules)
+        # Other host files are ordinary NixOS modules, imported by their host.
+        (inputs.import-tree.filter (path: builtins.baseNameOf path == "default.nix") ./hosts)
       ];
+      perSystem = { pkgs, ... }: {
+        formatter = pkgs.nixfmt-tree;
+        checks.foundation = import ./tests/foundation.nix {
+          flake = inputs.self;
+          inherit pkgs;
+        };
+        checks.desktop = import ./tests/desktop.nix {
+          flake = inputs.self;
+          inherit pkgs;
+        };
+        checks.shell = import ./tests/shell.nix {
+          flake = inputs.self;
+          inherit pkgs;
+        };
+      };
     };
 }
