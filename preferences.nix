@@ -26,7 +26,7 @@
       monospace = "JetBrainsMono Nerd Font";
     };
     cursor = {
-      name = "Breeze_Snow";
+      name = "Breeze_Light";
       size = 24;
     };
   };
