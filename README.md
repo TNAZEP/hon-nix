@@ -83,3 +83,21 @@ Reboot into your new system:
 ```bash
 reboot
 ```
+
+## Maintenance
+
+Run `zepbuild` to rebuild and switch the current host with `nix-output-monitor`.
+After a successful switch it keeps the newest 10 system generations and runs
+Nix garbage collection. Failed rebuilds skip cleanup. The command requests sudo
+when needed; do not run it until you intend to activate the configuration.
+
+Set `user.dotfilesDir` in `preferences.nix` to your checkout location (default:
+`/home/tnazep/hon-nix`). For a one-off location or extra rebuild options:
+
+```bash
+ZEPBUILD_FLAKE="/path/to/hon-nix" zepbuild
+zepbuild --show-trace
+```
+
+`zepbuild --help` shows usage. Existing weekly garbage collection remains enabled
+and independently removes generations older than 30 days.

@@ -3,6 +3,7 @@
     username = "tnazep";
     name = "Jacob Ennaimi";
     email = "jacob@ennaimi.com";
+    dotfilesDir = "/home/tnazep/hon-nix";
   };
   locale = {
     timezone = "Asia/Tokyo";

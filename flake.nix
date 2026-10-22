@@ -37,6 +37,7 @@
       ];
       perSystem = { pkgs, ... }: {
         formatter = pkgs.nixfmt-tree;
+        checks.maintenance = import ./tests/maintenance.nix { inherit pkgs; };
         checks.foundation = import ./tests/foundation.nix {
           flake = inputs.self;
           inherit pkgs;

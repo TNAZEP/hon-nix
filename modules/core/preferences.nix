@@ -17,6 +17,11 @@
           username = string "Primary login name.";
           name = string "Full name used by the account and Git.";
           email = string "Primary email address.";
+          dotfilesDir = mkOption {
+            type = types.strMatching "/.*";
+            default = "/home/${config.hon.user.username}/hon-nix";
+            description = "Local configuration checkout used by zepbuild.";
+          };
         };
         locale = {
           timezone = string "IANA time zone.";
