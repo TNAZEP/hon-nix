@@ -13,8 +13,11 @@ Row {
         Hon.Button {
             required property var modelData
             readonly property var workspace: Hyprland.workspaces.values.find(w => w.id === modelData.id) || null
-            text: String(modelData.label)
-            implicitWidth: 28
+            text: (selected ? "*" : workspace?.urgent ? "!" : " ") + String(modelData.label)
+            implicitWidth: 42
+            flat: true
+            fontSize: 16
+            textColor: workspace?.urgent ? Theme.urgent : Theme.foreground
             selected: root.monitor?.activeWorkspace?.id === modelData.id
             hint: "Workspace " + modelData.label + " · " + modelData.monitor
             onClicked: {
@@ -22,16 +25,6 @@ Row {
                     workspace.activate();
                 else
                     Hyprland.dispatch("hl.dsp.focus({ workspace = " + modelData.id + " })");
-            }
-            Rectangle {
-                anchors {
-                    bottom: parent.bottom
-                    horizontalCenter: parent.horizontalCenter
-                }
-                width: 12
-                height: 2
-                visible: !!parent.workspace && (parent.workspace.urgent || parent.workspace.toplevels.values.length > 0)
-                color: parent.workspace?.urgent ? Theme.urgent : Theme.muted
             }
         }
     }

@@ -274,8 +274,14 @@ context.objects = [
         marker.unlink()
         ipc("controls")
         time.sleep(0.25)
+        assert status()["panel"] == "notifications", "Controls opens the unified pane"
+        ipc("notifications")
+        wait_for(lambda: status()["panel"] == "", "Both shortcuts toggle the same pane")
+        ipc("settings")
+        wait_for(lambda: status()["panel"] == "settings", "Dedicated settings view")
+        time.sleep(0.25)
         key("Escape")
-        wait_for(lambda: status()["panel"] == "", "controls dismissal")
+        wait_for(lambda: status()["panel"] == "", "settings dismissal")
         def brightness(method="status", *args):
             result = subprocess.check_output(["qs", "--path", str(ui), "ipc", "call", "brightness", method, *map(str, args)], text=True).strip()
             return json.loads(result) if method == "status" else result
@@ -294,7 +300,7 @@ context.objects = [
         wait_for(lambda: audio()["available"] and audio()["inputAvailable"], "initial audio devices")
         assert len(audio()["outputs"]) == 2 and len(audio()["inputs"]) == 2, "Exclude application streams"
         assert not osd()["visible"], "Device discovery must not show volume OSD"
-        ipc("controls")
+        ipc("settings")
         time.sleep(0.3)
         key("Tab")  # Output volume slider.
         key("Tab")  # First output.

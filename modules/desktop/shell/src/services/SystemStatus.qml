@@ -7,6 +7,11 @@ import "../theme"
 QtObject {
     id: root
     property int cpu: -1
+    property var cpuHistory: [0, 0, 0, 0]
+    onCpuChanged: {
+        if (cpu >= 0)
+            cpuHistory = cpuHistory.slice(-3).concat([cpu]);
+    }
     property var previousCpu: null
     property string keyboard: Theme.values.keyboard
     property FileView cpuFile: FileView {

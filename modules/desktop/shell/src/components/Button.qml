@@ -7,6 +7,9 @@ AbstractButton {
 
     property bool selected: false
     property string hint: ""
+    property bool flat: false
+    property color textColor: Theme.foreground
+    property int fontSize: 13
 
     implicitWidth: Math.max(30, label.implicitWidth + 20)
     implicitHeight: 30
@@ -34,8 +37,9 @@ AbstractButton {
     }
 
     background: Rectangle {
-        color: root.selected || root.down ? Theme.accent : root.hovered || root.activeFocus ? Theme.surface : "transparent"
-        border.width: root.activeFocus ? 1 : 0
+        // Mouse focus persists after clicking; only keyboard focus needs a ring.
+        color: (!root.flat && root.selected) || root.down ? Theme.accent : root.hovered || root.visualFocus ? Theme.surface : "transparent"
+        border.width: root.visualFocus ? 1 : 0
         border.color: Theme.accent
     }
 
@@ -44,9 +48,9 @@ AbstractButton {
 
         text: root.text
         textFormat: Text.PlainText
-        color: !root.enabled ? Theme.muted : root.selected ? Theme.background : Theme.foreground
+        color: !root.enabled ? Theme.muted : root.selected ? (root.flat ? Theme.accent : Theme.background) : root.textColor
         font.family: Theme.font
-        font.pixelSize: 13
+        font.pixelSize: root.fontSize
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
         elide: Text.ElideRight

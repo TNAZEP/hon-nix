@@ -5,6 +5,14 @@ import "components" as Hon
 import "services"
 
 ShellRoot {
+    property string displayedPanel: "launcher"
+    Connections {
+        target: ShellState
+        function onPanelChanged() {
+            if (ShellState.panel !== "")
+                displayedPanel = ShellState.panel;
+        }
+    }
     Variants {
         model: Quickshell.screens
         Bar {}
@@ -28,6 +36,9 @@ ShellRoot {
         function notifications(): void {
             ShellState.toggle("notifications");
         }
+        function settings(): void {
+            ShellState.toggle("settings");
+        }
         function close(): void {
             ShellState.close();
         }
@@ -40,9 +51,10 @@ ShellRoot {
         }
     }
     Hon.Popup {
-        panelWidth: ShellState.panel === "power" ? 360 : 620
-        panelHeight: ShellState.panel === "power" ? 410 : 540
-        content: ShellState.panel === "launcher" ? launcher : ShellState.panel === "power" ? power : ShellState.panel === "notifications" ? notifications : controls
+        drawer: displayedPanel === "notifications"
+        panelWidth: displayedPanel === "power" ? 360 : displayedPanel === "settings" ? 900 : drawer ? 540 : 620
+        panelHeight: displayedPanel === "power" ? 410 : displayedPanel === "settings" ? 680 : 540
+        content: displayedPanel === "launcher" ? launcher : displayedPanel === "power" ? power : displayedPanel === "notifications" ? notifications : controls
     }
     Component {
         id: launcher

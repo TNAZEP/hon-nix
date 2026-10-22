@@ -10,5 +10,5 @@ Settings {
     readonly property color border: values.palette.borderInactive
     readonly property color urgent: values.palette.error
     readonly property string font: values.font
-    readonly property int barHeight: 36
+    readonly property int barHeight: 40
 }

@@ -11,7 +11,7 @@
       data = {
         inherit (config.hon) workspaces monitors;
         inherit (config.hon.appearance) palette;
-        font = config.hon.appearance.font.sans;
+        font = config.hon.appearance.font.monospace;
         terminal = config.hon.desktop.terminal;
         keyboard = config.hon.locale.keyboard;
         commands = {
@@ -46,6 +46,7 @@
           ];
           hyprctl = "hyprctl";
           brightnessctl = "${pkgs.brightnessctl}/bin/brightnessctl";
+          awww = "${pkgs.awww}/bin/awww";
         };
       };
       settings = pkgs.writeText "hon-shell-settings.qml" ''
@@ -70,13 +71,40 @@
     {
       services.upower.enable = true;
       home-manager.users.${config.hon.user.username} = {
-        home.packages = [ pkgs.quickshell ];
+        home.packages = [
+          pkgs.quickshell
+          pkgs.awww
+        ];
+        systemd.user.services.hon-wallpaper = {
+          Unit = {
+            Description = "awww wallpaper daemon";
+            PartOf = [ session ];
+            After = [ session ];
+          };
+          Service = {
+            ExecStart = "${pkgs.awww}/bin/awww-daemon";
+            ExecStartPost = pkgs.writeShellScript "wait-for-awww" ''
+              for attempt in {1..50}; do
+                ${pkgs.awww}/bin/awww query >/dev/null 2>&1 && exit 0
+                ${pkgs.coreutils}/bin/sleep 0.1
+              done
+              exit 1
+            '';
+            Restart = "on-failure";
+            RestartSec = 2;
+          };
+          Install.WantedBy = [ session ];
+        };
         xdg.configFile."quickshell/hon-shell".source = source;
         systemd.user.services.hon-shell = {
           Unit = {
             Description = "hon-shell desktop shell";
             PartOf = [ session ];
-            After = [ session ];
+            After = [
+              session
+              "hon-wallpaper.service"
+            ];
+            Wants = [ "hon-wallpaper.service" ];
             X-Restart-Triggers = [ "${source}" ];
           };
           Service = {
