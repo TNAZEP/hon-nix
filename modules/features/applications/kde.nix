@@ -4,6 +4,7 @@
       dolphin
       dolphin-plugins
       ark
+      pkgs.unrar
       gwenview
       okular
       spectacle

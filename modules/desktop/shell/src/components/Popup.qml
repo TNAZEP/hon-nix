@@ -31,7 +31,11 @@ PanelWindow {
         left: true
         right: true
     }
-    exclusionMode: ExclusionMode.Ignore
+    // Respect the bar's reserved space for the drawer, without reserving
+    // additional space or moving tiled windows. Its inner 8px margins match
+    // Hyprland's gaps_out.
+    exclusiveZone: 0
+    exclusionMode: drawer ? ExclusionMode.Normal : ExclusionMode.Ignore
     color: "#66000000"
     WlrLayershell.namespace: "hon-shell-panel"
     WlrLayershell.layer: WlrLayer.Overlay

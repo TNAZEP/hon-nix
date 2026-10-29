@@ -55,6 +55,10 @@
             platformTheme.name = "kde";
             style.name = "breeze";
             kde.settings = {
+              # KDED 6 still reads kded5rc. Home Manager owns GTK settings;
+              # avoid KDE's late GTK/XSettings rewrite when Dolphin starts
+              # KDED, which coincides with GTK client crashes in Hyprland.
+              kded5rc."Module-gtkconfig".autoload = false;
               kdeglobals = {
                 General = {
                   ColorScheme = "BreezeDark";

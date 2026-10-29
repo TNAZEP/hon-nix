@@ -2,7 +2,7 @@
 
 A modular, flake-based NixOS workstation configuration managed with **Nix Flakes** and **Home Manager**. Hyprland with a custom Quickshell shell is the primary desktop; Plasma is available as a fallback.
 
-This branch (Koushin) is a massive refactor and restructuring of the entire setup, cleaning up old complex abstractions and replacing them with structures that are easier to use and build upon. Also includes a rewrite of my shell in quickshell, will potentially be split into a sepparate repo in the future.
+This branch (Koushin) is a massive refactor and restructuring of the entire setup, cleaning up old complex abstractions and replacing them with structures that are easier to use and build upon. Also includes a rewrite of my shell in quickshell, will potentially be split into a sepparate repo in the future. When this branch gets merged to main, it will instead be used as my in development branch.
 
 ## Structure
 
