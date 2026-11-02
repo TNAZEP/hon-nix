@@ -46,7 +46,7 @@ ColumnLayout {
             Binding {
                 target: deviceRow.modelData
                 property: "scannerEnabled"
-                value: root.radioEnabled
+                value: root.visible && root.radioEnabled
                 restoreMode: Binding.RestoreNone
             }
             Text {

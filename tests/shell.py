@@ -87,11 +87,14 @@ def run_session(source, directory):
     for harness in ["WifiHarness.qml", "BluetoothHarness.qml"]:
         shutil.copyfile(Path(__file__).with_name(harness), ui / harness)
     entrypoint = ui / "shell.qml"
-    entrypoint.write_text(entrypoint.read_text().replace(
+    original_entrypoint = entrypoint.read_text()
+    panel_binding = '        content: displayedPanel === "launcher"'
+    assert panel_binding in original_entrypoint, "Update fixture injection for the shell panel binding"
+    entrypoint.write_text(original_entrypoint.replace(
         '        function launcher(): void {',
         '        function bluetoothTest(): void { ShellState.toggle("bluetooth-test"); }\n        function wifiTest(): void { ShellState.toggle("wifi-test"); }\n        function launcher(): void {'
-    ).replace('        content: ShellState.panel === "launcher"',
-              '        content: ShellState.panel === "bluetooth-test" ? bluetoothTest : ShellState.panel === "wifi-test" ? wifiTest : ShellState.panel === "launcher"'
+    ).replace(panel_binding,
+              '        content: displayedPanel === "bluetooth-test" ? bluetoothTest : displayedPanel === "wifi-test" ? wifiTest : displayedPanel === "launcher"'
     ).replace('    Osd {}', '    Component { id: bluetoothTest; BluetoothHarness {} }\n    Component { id: wifiTest; WifiHarness {} }\n    Osd {}'))
     settings = ui / "theme/Settings.qml"
     original = settings.read_text()
@@ -396,6 +399,10 @@ context.objects = [
 
         ipc("wifiTest")
         wait_for(lambda: wifi()["scanning"], "Wi-Fi scanning while panel open")
+        wifi("shown", "false")
+        wait_for(lambda: not wifi()["scanning"], "Hidden settings category stops Wi-Fi scanning")
+        wifi("shown", "true")
+        wait_for(lambda: wifi()["scanning"], "Visible settings category resumes Wi-Fi scanning")
         wifi("fail")
         assert not wifi()["passwordVisible"], "Unrequested failures must not prompt"
         wifi_action("wifi-connect")

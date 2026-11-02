@@ -8,10 +8,6 @@ QtObject {
     id: root
     property int cpu: -1
     property var cpuHistory: [0, 0, 0, 0]
-    onCpuChanged: {
-        if (cpu >= 0)
-            cpuHistory = cpuHistory.slice(-3).concat([cpu]);
-    }
     property var previousCpu: null
     property string keyboard: Theme.values.keyboard
     property FileView cpuFile: FileView {
@@ -22,8 +18,10 @@ QtObject {
                 return;
             const total = fields.reduce((a, b) => a + b, 0);
             const idle = fields[3] + fields[4];
-            if (root.previousCpu && total > root.previousCpu.total)
+            if (root.previousCpu && total > root.previousCpu.total) {
                 root.cpu = Math.max(0, Math.min(100, Math.round(100 * (1 - (idle - root.previousCpu.idle) / (total - root.previousCpu.total)))));
+                root.cpuHistory = root.cpuHistory.slice(-3).concat([root.cpu]);
+            }
             root.previousCpu = {
                 total,
                 idle

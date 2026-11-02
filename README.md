@@ -2,14 +2,16 @@
 
 A modular, flake-based NixOS workstation configuration managed with **Nix Flakes** and **Home Manager**. Hyprland with a custom Quickshell shell is the primary desktop; Plasma is available as a fallback.
 
-This branch (Koushin) is a massive refactor and restructuring of the entire setup, cleaning up old complex abstractions and replacing them with structures that are easier to use and build upon. Also includes a rewrite of my shell in quickshell, will potentially be split into a sepparate repo in the future. When this branch gets merged to main, it will instead be used as my in development branch.
+`main` contains the workstation configuration; `koushin` is the development
+branch. Features are composed explicitly per host, with shared preferences and
+a custom Quickshell desktop shell.
 
 ## Structure
 
 The repository is organized using **flake-parts** and **import-tree** following the Dendritic pattern:
 
 - `hosts/`: machine-specific hardware, disks, and feature selection.
-- `modules/`: core, hardware, desktop, and user features.
+- `modules/`: core, hardware, desktop, and application/service features.
 - `preferences.nix`: identity, locale, application choices, and appearance.
 - `assets/`: static configuration files.
 - `tests/`: configuration and isolated desktop-shell checks.
@@ -23,7 +25,7 @@ The repository is organized using **flake-parts** and **import-tree** following 
 
 ## Installation
 
-Follow these steps to install this configuration on a new machine (specifically targeting `midgar`, my desktop config). 
+Follow these steps to install this configuration on a new machine (specifically targeting `midgar`, my desktop config).
 These commands require Nix flakes and `nix-command` support.
 
 ### 1. Prepare the Environment
@@ -84,7 +86,34 @@ Reboot into your new system:
 reboot
 ```
 
-## Maintenance
+## Desktop
+
+The shell uses a compact per-monitor bar and a right-side pane containing
+notifications and quick settings. Settings opens a category-based window with
+audio, display, network, Bluetooth, media, notification, and appearance controls.
+
+| Shortcut | Action |
+| --- | --- |
+| Super+Space | Application launcher |
+| Super+A or Super+N | Notifications and quick settings pane |
+| Super+Shift+Space | Power/session menu |
+| Escape | Close the open shell panel |
+
+Appearance includes a wallpaper picker starting in `~/Pictures/Wallpapers`.
+It applies wallpapers through the session-managed awww daemon and saves the
+selection in `~/.config/hon-shell/appearance.ini` (or under `XDG_CONFIG_HOME`).
+Advanced network configuration and Bluetooth pairing open KDE tools.
+Notification history lasts for the current shell session.
+
+GTK and KDE appearance are managed by Home Manager. KDE's automatic GTK
+synchronization is disabled to avoid competing runtime settings updates.
+
+## Services and development
+
+Midgar includes Docker, libvirt/virt-manager, Tailscale, and Go Task (`task`).
+Docker group membership allows running containers without sudo; log in again
+after adding the group. Tailscale authentication is a separate interactive step
+when needed: `sudo tailscale up`.
 
 ### Local AI
 
@@ -115,7 +144,7 @@ journalctl -u docker-odysseus -b
 docker logs odysseus
 ```
 
-### Rebuilding
+## Maintenance
 
 Run `zepbuild` to rebuild and switch the current host with `nix-output-monitor`.
 After a successful switch it keeps the newest 10 system generations and runs
@@ -132,3 +161,23 @@ zepbuild --show-trace
 
 `zepbuild --help` shows usage. Existing weekly garbage collection remains enabled
 and independently removes generations older than 30 days.
+
+Home Manager preserves conflicting unmanaged files as `.backup` files and
+retains older backups with numbered suffixes. A successful build can still fail
+during activation; `zepbuild` skips cleanup in that case. Inspect failures with
+`systemctl --failed` and `journalctl -b -u home-manager-tnazep.service`.
+
+## Validation
+
+Before merging configuration changes:
+
+```sh
+nix fmt -- --fail-on-change
+nix flake check --show-trace
+nix build .#nixosConfigurations.midgar.config.system.build.toplevel --no-link
+```
+
+The checks cover core configuration, workspace allocation, rebuild/cleanup
+behavior, and the shell in an isolated headless Wayland session with test audio,
+network, and Bluetooth fixtures. They do not replace physical-device testing.
+The system build above does not activate the configuration.

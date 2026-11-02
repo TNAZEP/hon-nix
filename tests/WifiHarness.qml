@@ -7,6 +7,7 @@ FocusScope {
     id: root
     property bool radio: true
     property bool present: true
+    property bool panelVisible: true
     function findItem(item, name) {
         if (item.objectName === name) return item;
         for (const child of item.children || []) {
@@ -53,6 +54,7 @@ FocusScope {
         contentWidth: availableWidth
         WifiPanel {
             width: parent.width
+            visible: root.panelVisible
             devices: root.present ? [device] : []
             radioEnabled: root.radio
         }
@@ -61,6 +63,7 @@ FocusScope {
         target: "wifi-fixture"
         function focus(name: string): void { root.findItem(root, name)?.forceActiveFocus(); }
         function radio(value: bool): void { root.radio = value; }
+        function shown(value: bool): void { root.panelVisible = value; }
         function remove(): void { root.present = false; }
         function security(value: int): void { network.security = value; }
         function fail(): void { network.connectionFailed(ConnectionFailReason.NoSecrets); }
