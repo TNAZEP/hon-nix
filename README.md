@@ -86,6 +86,37 @@ reboot
 
 ## Maintenance
 
+### Local AI
+
+`modules/features/ai.nix` manages Ollama with Vulkan acceleration and the
+Odysseus Docker application, including its ChromaDB memory and SearXNG search
+services. Midgar imports this module. The web interface and service APIs bind
+to localhost; Odysseus uses host networking to reach Ollama.
+
+After `zepbuild`, open <http://localhost:7011>. Retrieve the generated first-login
+admin password locally with `docker logs odysseus`, then complete setup in the
+web interface. The Ollama OpenAI-compatible endpoint is
+`http://127.0.0.1:11434/v1` and its API key can be left empty for local use.
+Download models with `ollama pull MODEL`, or declare them in
+`services.ollama.loadModels` in the AI module. Check actual GPU use with
+`ollama ps` while a model is running.
+
+Ollama models persist in `/var/lib/ollama/models`. Odysseus and its supporting
+services use Docker named volumes prefixed `odysseus-`; recreating containers
+keeps this data. Container images are pinned in the AI module; update the image
+references there when upgrading. The deployment follows the
+[upstream Docker setup](https://github.com/odysseus-dev/odysseus/blob/main/docker-compose.yml).
+
+Inspect startup failures with:
+
+```sh
+systemctl status ollama docker-odysseus docker-odysseus-chromadb docker-odysseus-searxng
+journalctl -u docker-odysseus -b
+docker logs odysseus
+```
+
+### Rebuilding
+
 Run `zepbuild` to rebuild and switch the current host with `nix-output-monitor`.
 After a successful switch it keeps the newest 10 system generations and runs
 Nix garbage collection. Failed rebuilds skip cleanup. The command requests sudo

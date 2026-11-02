@@ -37,6 +37,13 @@ if "${privilege[@]}" "$(command -v nixos-rebuild)" switch --flake ".#$host" --lo
   "${privilege[@]}" "$(command -v nix-collect-garbage)"
   printf 'Done.\n'
 else
-  printf 'Rebuild or output monitor failed. Skipping garbage collection.\n' >&2
+  pipeline_status=("${PIPESTATUS[@]}")
+  if (( pipeline_status[0] != 0 )); then
+    printf 'nixos-rebuild failed (exit %s); this can include activation failures after a successful build.\nCheck: systemctl --failed\nHome Manager details: journalctl -b -u home-manager-%s.service\n' "${pipeline_status[0]}" "${SUDO_USER:-${USER:-unknown}}" >&2
+  fi
+  if (( pipeline_status[1] != 0 )); then
+    printf 'Output monitor failed (exit %s).\n' "${pipeline_status[1]}" >&2
+  fi
+  printf 'Skipping garbage collection.\n' >&2
   exit 1
 fi

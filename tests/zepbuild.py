@@ -58,6 +58,8 @@ if os.environ.get("FAIL_COMMAND") == name: sys.exit(7)
     for failure in ["nixos-rebuild", "nom"]:
         result, calls = run(fail=failure)
         assert result.returncode != 0
+        expected = "nixos-rebuild failed (exit 7)" if failure == "nixos-rebuild" else "Output monitor failed (exit 7)"
+        assert expected in result.stderr, result.stderr
         assert not any(c[0] in ("nix-env", "nix-collect-garbage") for c in calls), calls
     result, calls = run(fail="nix-env")
     assert result.returncode != 0 and not any(c[0] == "nix-collect-garbage" for c in calls)

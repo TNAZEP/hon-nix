@@ -19,8 +19,6 @@
     in
     {
       environment.systemPackages = with pkgs; [
-        kdePackages.elisa
-        kdePackages.dragon
         kdePackages.ffmpegthumbs
         kdePackages.audiocd-kio
         kdePackages.kimageformats

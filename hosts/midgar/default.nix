@@ -17,6 +17,7 @@
       inputs.self.nixosModules.editors
       inputs.self.nixosModules.communication
       inputs.self.nixosModules.media
+      inputs.self.nixosModules.entertainment
       inputs.self.nixosModules.graphics
       inputs.self.nixosModules.devTools
       inputs.self.nixosModules.git
@@ -26,6 +27,7 @@
       inputs.self.nixosModules.gaming
       inputs.self.nixosModules.libvirt
       inputs.self.nixosModules.docker
+      inputs.self.nixosModules.ai
       inputs.self.nixosModules.tailscale
       inputs.self.nixosModules.appimage
       {
