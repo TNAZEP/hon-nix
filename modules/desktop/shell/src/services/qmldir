@@ -1,0 +1,6 @@
+singleton ShellState 1.0 ShellState.qml
+singleton Audio 1.0 Audio.qml
+singleton SystemStatus 1.0 SystemStatus.qml
+singleton Notifications 1.0 Notifications.qml
+NotificationEntry 1.0 NotificationEntry.qml
+singleton Brightness 1.0 Brightness.qml

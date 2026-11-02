@@ -1,23 +1,35 @@
 # 本ーニクス (hon-nix)
 
-A modular, flake-based NixOS configuration designed for stability and ease of use. Managed with **Nix Flakes** and **Home Manager**.
+A modular, flake-based NixOS workstation configuration managed with **Nix Flakes** and **Home Manager**. Hyprland with a custom Quickshell shell is the primary desktop; Plasma is available as a fallback.
+
+`main` contains the workstation configuration; `koushin` is the development
+branch. Features are composed explicitly per host, with shared preferences and
+a custom Quickshell desktop shell.
 
 ## Structure
 
 The repository is organized using **flake-parts** and **import-tree** following the Dendritic pattern:
 
+- `hosts/`: machine-specific hardware, disks, and feature selection.
+- `modules/`: core, hardware, desktop, and application/service features.
+- `preferences.nix`: identity, locale, application choices, and appearance.
+- `assets/`: static configuration files.
+- `tests/`: configuration and isolated desktop-shell checks.
+
 ## Hosts
 
-|     | Hostname   | OS   			| Board            | CPU                | RAM   | GPU                       | Purpose                                                                          |
-| --- | ---------- | -------------- | ---------------- | ------------------ | ----- | ------------------------- | -------------------------------------------------------------------------------- |
-| 🖥️  | `midgar`   | NixOS	        | Asus		       | Ryzen 7 5800X3D    | 32GB  | RX 9070XT / RTX 3070	    | Main Desktop for general use, development and gaming.		                       |
-| 💻  | `ishgard`  | Asahi Nixos		| Apple M1 air	   | M1 8C		        | 8 GB  | M1 7C	                    | General use, light development and media consumption.                            |
+| | Hostname | OS | Board | CPU | RAM | GPU | Purpose |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 🖥️ | `midgar` | NixOS | Asus | Ryzen 7 5800X3D | 32 GB | RX 9070 XT | Main desktop for general use, development, and gaming. |
+
 
 ## Installation
 
 Follow these steps to install this configuration on a new machine (specifically targeting `midgar`, my desktop config).
+These commands require Nix flakes and `nix-command` support.
 
 ### 1. Prepare the Environment
+
 Boot into the NixOS installation media and switch to the root user:
 
 ```bash
@@ -27,28 +39,35 @@ sudo su
 Clone this repository:
 
 ```bash
-git clone https://github.com/yourusername/hon-nix.git
-cd shin-nix
+git clone https://github.com/TNAZEP/hon-nix.git
+cd hon-nix
 ```
 
 ### 2. Partition the Disk (Disko)
+
 > [!WARNING]
-> This step will **FORMAT** the target disk (`/dev/nvme0n1` for midgar). Ensure you have backed up any important data.
+> This step will **FORMAT** the target disk (`/dev/nvme0n1` for midgar). Verify the disk by model and serial, and ensure you have backed up any important data. Do not run this formatting step to reuse an existing installation.
+
+The layout is an EFI partition ending at 2 GiB, 32 GiB swap, and unencrypted Btrfs subvolumes for `/`, `/home`, and `/nix`.
 
 Run Disko to partition, format, and mount the drives:
 
 ```bash
-nix run github:nix-community/disko -- --mode disko ./modules/hosts/midgar/_disko.nix
+nix run github:nix-community/disko -- --mode disko ./hosts/midgar/disko.nix
 ```
 
 ### 3. Install NixOS
-Install the system using the flake configuration:
+
+Check and build the configuration, then install it:
 
 ```bash
+nix flake check
+nix build .#nixosConfigurations.midgar.config.system.build.toplevel
 nixos-install --flake .#midgar
 ```
 
 ### 4. Set Passwords
+
 Enter the new system to set passwords for the root user and your user (`tnazep`):
 
 ```bash
@@ -60,8 +79,105 @@ nixos-enter --root /mnt -c 'passwd tnazep'
 ```
 
 ### 5. Finish
+
 Reboot into your new system:
 
 ```bash
 reboot
 ```
+
+## Desktop
+
+The shell uses a compact per-monitor bar and a right-side pane containing
+notifications and quick settings. Settings opens a category-based window with
+audio, display, network, Bluetooth, media, notification, and appearance controls.
+
+| Shortcut | Action |
+| --- | --- |
+| Super+Space | Application launcher |
+| Super+A or Super+N | Notifications and quick settings pane |
+| Super+Shift+Space | Power/session menu |
+| Escape | Close the open shell panel |
+
+Appearance includes a wallpaper picker starting in `~/Pictures/Wallpapers`.
+It applies wallpapers through the session-managed awww daemon and saves the
+selection in `~/.config/hon-shell/appearance.ini` (or under `XDG_CONFIG_HOME`).
+Advanced network configuration and Bluetooth pairing open KDE tools.
+Notification history lasts for the current shell session.
+
+GTK and KDE appearance are managed by Home Manager. KDE's automatic GTK
+synchronization is disabled to avoid competing runtime settings updates.
+
+## Services and development
+
+Midgar includes Docker, libvirt/virt-manager, Tailscale, and Go Task (`task`).
+Docker group membership allows running containers without sudo; log in again
+after adding the group. Tailscale authentication is a separate interactive step
+when needed: `sudo tailscale up`.
+
+### Local AI
+
+`modules/features/ai.nix` manages Ollama with Vulkan acceleration and the
+Odysseus Docker application, including its ChromaDB memory and SearXNG search
+services. Midgar imports this module. The web interface and service APIs bind
+to localhost; Odysseus uses host networking to reach Ollama.
+
+After `zepbuild`, open <http://localhost:7011>. Retrieve the generated first-login
+admin password locally with `docker logs odysseus`, then complete setup in the
+web interface. The Ollama OpenAI-compatible endpoint is
+`http://127.0.0.1:11434/v1` and its API key can be left empty for local use.
+Download models with `ollama pull MODEL`, or declare them in
+`services.ollama.loadModels` in the AI module. Check actual GPU use with
+`ollama ps` while a model is running.
+
+Ollama models persist in `/var/lib/ollama/models`. Odysseus and its supporting
+services use Docker named volumes prefixed `odysseus-`; recreating containers
+keeps this data. Container images are pinned in the AI module; update the image
+references there when upgrading. The deployment follows the
+[upstream Docker setup](https://github.com/odysseus-dev/odysseus/blob/main/docker-compose.yml).
+
+Inspect startup failures with:
+
+```sh
+systemctl status ollama docker-odysseus docker-odysseus-chromadb docker-odysseus-searxng
+journalctl -u docker-odysseus -b
+docker logs odysseus
+```
+
+## Maintenance
+
+Run `zepbuild` to rebuild and switch the current host with `nix-output-monitor`.
+After a successful switch it keeps the newest 10 system generations and runs
+Nix garbage collection. Failed rebuilds skip cleanup. The command requests sudo
+when needed; do not run it until you intend to activate the configuration.
+
+Set `user.dotfilesDir` in `preferences.nix` to your checkout location (default:
+`/home/tnazep/hon-nix`). For a one-off location or extra rebuild options:
+
+```bash
+ZEPBUILD_FLAKE="/path/to/hon-nix" zepbuild
+zepbuild --show-trace
+```
+
+`zepbuild --help` shows usage. Existing weekly garbage collection remains enabled
+and independently removes generations older than 30 days.
+
+Home Manager preserves conflicting unmanaged files as `.backup` files and
+retains older backups with numbered suffixes. A successful build can still fail
+during activation; `zepbuild` skips cleanup in that case. Inspect failures with
+`systemctl --failed` and `journalctl -b -u home-manager-tnazep.service`.
+
+## Validation
+
+Before merging configuration changes:
+
+```sh
+nix fmt -- --fail-on-change
+nix flake check --show-trace
+nix build .#nixosConfigurations.midgar.config.system.build.toplevel --no-link
+```
+
+The checks cover core configuration, workspace allocation, rebuild/cleanup
+behavior, and the shell in an isolated headless Wayland session with test audio,
+network, and Bluetooth fixtures. They do not replace physical-device testing.
+The system build above does not activate the configuration.
