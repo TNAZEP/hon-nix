@@ -37,12 +37,18 @@
       ];
       perSystem = { pkgs, ... }: {
         packages.capture-view = pkgs.callPackage ./pkgs/capture-view.nix { };
+        packages.es-de = pkgs.callPackage ./pkgs/es-de.nix { };
         formatter = pkgs.nixfmt-tree;
         checks.maintenance = import ./tests/maintenance.nix { inherit pkgs; };
         checks.foundation = import ./tests/foundation.nix {
           flake = inputs.self;
           inherit pkgs;
         };
+        checks.retro = import ./tests/retro.nix {
+          flake = inputs.self;
+          inherit pkgs;
+        };
+        checks.retro-ui = import ./tests/retro-ui.nix { inherit pkgs; };
         checks.desktop = import ./tests/desktop.nix {
           flake = inputs.self;
           inherit pkgs;
