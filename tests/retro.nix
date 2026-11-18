@@ -28,6 +28,9 @@ pkgs.runCommand "hon-retro-library-checks"
     retro-play --version
     retro-play --profile n64 --version
     retro-play --profile ultimate2 --version
+    retro-play --profile n64 --presentation crt --version
+    retro-play --presentation gba-lcd --profile ultimate2 --version
+    retro-play --presentation raw --version
     test -f "$XDG_CONFIG_HOME/hon-retro/retroarch.cfg"
     printf '%s\n' '# User experiment' > "$XDG_CONFIG_HOME/hon-retro/retroarch.cfg"
     retro-play --version

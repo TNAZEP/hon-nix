@@ -22,6 +22,8 @@
         sort_savefiles_enable = "true";
         sort_savestates_enable = "true";
         core_info_cache_enable = "false";
+        ui_companion_start_on_boot = "false";
+        desktop_menu_enable = "false";
         assets_directory = "${pkgs.retroarch-assets}/share/retroarch/assets";
         libretro_info_path = "${pkgs.libretro-core-info}/share/retroarch/cores";
         joypad_autoconfig_dir = "${controllerProfiles}";
@@ -48,6 +50,27 @@
       ultimateController = pkgs.writeText "retro-ultimate2-controller.cfg" (
         renderSettings retroarchSettings
       );
+      shaders = "${pkgs.libretro-shaders-slang}/share/libretro/shaders/shaders_slang";
+      crtPreset = pkgs.writeText "retro-crt.slangp" ''
+        #reference "${shaders}/bezel/Mega_Bezel/Presets/MBZ__3__STD.slangp"
+        HSM_INTRO_WHEN_TO_SHOW = "0"
+        HSM_REFLECT_GLOBAL_AMOUNT = "20"
+      '';
+      crtPresentation = pkgs.writeText "retro-crt.cfg" (renderSettings {
+        video_shader_enable = "true";
+        video_scale_integer = "false";
+        # Mega Bezel owns the inner content ratio, within a full viewport.
+        aspect_ratio_index = "24";
+      });
+      lcdPresentation = pkgs.writeText "retro-gba-lcd.cfg" (renderSettings {
+        video_shader_enable = "true";
+        video_scale_integer = "false";
+        aspect_ratio_index = "22";
+      });
+      rawPresentation = pkgs.writeText "retro-raw.cfg" (renderSettings {
+        video_shader_enable = "false";
+        aspect_ratio_index = "22";
+      });
       retroarch = pkgs.wrapRetroArch {
         cores = config.hon.retro.cores;
         settings = retroarchSettings;
@@ -63,7 +86,7 @@
         text = ''
           config_dir="''${XDG_CONFIG_HOME:-$HOME/.config}/hon-retro"
           data_dir="''${XDG_DATA_HOME:-$HOME/.local/share}/hon-retro"
-          mkdir -p "$config_dir" "$data_dir"/{bios,saves,states}
+          mkdir -p "$config_dir" "$data_dir"/{bios,saves,states,shaders}
           if [[ ! -e "$config_dir/retroarch.cfg" ]]; then
             # Seed a writable base once; rebuilding never replaces experiments.
             (set -o noclobber
@@ -72,19 +95,47 @@
           savefile_directory = "$data_dir/saves"
           savestate_directory = "$data_dir/states"
           system_directory = "$data_dir/bios"
+          video_shader_dir = "$data_dir/shaders"
           EOF
             ) || true
           fi
-          profile_args=()
-          if [[ "''${1:-}" == --profile ]]; then
-            case "''${2:-}" in
-              n64) profile_args=(--appendconfig ${n64Controller}) ;;
-              ultimate2) profile_args=(--appendconfig ${ultimateController}) ;;
-              *) echo 'retro-play: expected --profile n64 or ultimate2' >&2; exit 2 ;;
+          profile_config=${ultimateController}
+          presentation_config=
+          shader_args=()
+          while [[ $# -gt 0 ]]; do
+            case "$1" in
+              --profile)
+                case "''${2:-}" in
+                  n64) profile_config=${n64Controller} ;;
+                  ultimate2) profile_config=${ultimateController} ;;
+                  *) echo 'retro-play: expected --profile n64 or ultimate2' >&2; exit 2 ;;
+                esac
+                shift 2
+                ;;
+              --presentation)
+                shader_args=()
+                case "''${2:-}" in
+                  crt)
+                    presentation_config=${crtPresentation}
+                    shader_args=(--set-shader ${crtPreset})
+                    ;;
+                  gba-lcd)
+                    presentation_config=${lcdPresentation}
+                    shader_args=(--set-shader ${shaders}/presets/handheld-plus-color-mod/lcd-grid-v2-gba-color.slangp)
+                    ;;
+                  raw) presentation_config=${rawPresentation} ;;
+                  *) echo 'retro-play: expected --presentation crt, gba-lcd or raw' >&2; exit 2 ;;
+                esac
+                shift 2
+                ;;
+              *) break ;;
             esac
-            shift 2
+          done
+          if [[ -n "$presentation_config" ]]; then
+            profile_config+="|$presentation_config"
           fi
-          exec ${lib.getExe retroarch} --config "$config_dir/retroarch.cfg" "''${profile_args[@]}" "$@"
+          exec ${lib.getExe retroarch} --config "$config_dir/retroarch.cfg" \
+            --appendconfig "$profile_config" "''${shader_args[@]}" "$@"
         '';
       };
       home = pkgs.writeShellApplication {
@@ -155,28 +206,46 @@
         services.udev.packages = [ pkgs.dolphin-emu ];
         home-manager.users.${config.hon.user.username} = {
           xdg.dataFile = {
+            "hon-retro/shaders/pinned".source = shaders;
             "hon-retro/frontend/themes/iisu-interpreted-es-de".source =
               "${theme}/share/es-de/themes/iisu-interpreted-es-de";
             "hon-retro/frontend/custom_systems/es_find_rules.xml".source = findRules;
             # Standalone Dolphin is required for the native GC adapter and Wiimotes.
             "hon-retro/frontend/custom_systems/es_systems.xml".text = ''
-                <?xml version="1.0"?>
-                <systemList>
-              <system>
-                <name>n64</name><fullname>Nintendo 64</fullname>
-                <path>%ROMPATH%/n64</path>
-                <extension>.n64 .N64 .v64 .V64 .z64 .Z64 .zip .ZIP .7z .7Z</extension>
-                <command label="Mupen64Plus-Next">%EMULATOR_RETROARCH% --profile n64 -L %CORE_RETROARCH%/mupen64plus_next_libretro.so %ROM%</command>
-                <platform>n64</platform><theme>n64</theme>
-              </system>
-                  <system>
-                    <name>gc</name><fullname>Nintendo GameCube</fullname>
-                    <path>%ROMPATH%/gc</path>
-                    <extension>.gcm .GCM .iso .ISO .rvz .RVZ .gcz .GCZ .wia .WIA .ciso .CISO .dol .DOL .elf .ELF .m3u .M3U</extension>
-                    <command label="Dolphin (Standalone)">%EMULATOR_DOLPHIN% -b -e %ROM%</command>
-                    <platform>gc</platform><theme>gc</theme>
-                  </system>
-                </systemList>
+              <?xml version="1.0"?>
+              <systemList>
+                <system>
+                  <name>fds</name><fullname>Nintendo Famicom Disk System</fullname>
+                  <path>%ROMPATH%/fds</path>
+                  <extension>.nes .NES .fds .FDS .unf .UNF .unif .UNIF .7z .7Z .zip .ZIP</extension>
+                  <command label="Mesen (CRT)">%EMULATOR_RETROARCH% --presentation crt -L %CORE_RETROARCH%/mesen_libretro.so %ROM%</command>
+                  <command label="Mesen (Unfiltered)">%EMULATOR_RETROARCH% --presentation raw -L %CORE_RETROARCH%/mesen_libretro.so %ROM%</command>
+                  <platform>fds</platform><theme>fds</theme>
+                </system>
+                <system>
+                  <name>n64</name><fullname>Nintendo 64</fullname>
+                  <path>%ROMPATH%/n64</path>
+                  <extension>.n64 .N64 .v64 .V64 .z64 .Z64 .zip .ZIP .7z .7Z</extension>
+                  <command label="Mupen64Plus-Next (CRT)">%EMULATOR_RETROARCH% --profile n64 --presentation crt -L %CORE_RETROARCH%/mupen64plus_next_libretro.so %ROM%</command>
+                  <command label="Mupen64Plus-Next (Unfiltered)">%EMULATOR_RETROARCH% --profile n64 --presentation raw -L %CORE_RETROARCH%/mupen64plus_next_libretro.so %ROM%</command>
+                  <platform>n64</platform><theme>n64</theme>
+                </system>
+                <system>
+                  <name>gba</name><fullname>Nintendo Game Boy Advance</fullname>
+                  <path>%ROMPATH%/gba</path>
+                  <extension>.agb .AGB .bin .BIN .gba .GBA .7z .7Z .zip .ZIP</extension>
+                  <command label="mGBA (LCD)">%EMULATOR_RETROARCH% --presentation gba-lcd -L %CORE_RETROARCH%/mgba_libretro.so %ROM%</command>
+                  <command label="mGBA (Unfiltered)">%EMULATOR_RETROARCH% --presentation raw -L %CORE_RETROARCH%/mgba_libretro.so %ROM%</command>
+                  <platform>gba</platform><theme>gba</theme>
+                </system>
+                <system>
+                  <name>gc</name><fullname>Nintendo GameCube</fullname>
+                  <path>%ROMPATH%/gc</path>
+                  <extension>.gcm .GCM .iso .ISO .rvz .RVZ .gcz .GCZ .wia .WIA .ciso .CISO .dol .DOL .elf .ELF .m3u .M3U</extension>
+                  <command label="Dolphin (Standalone)">%EMULATOR_DOLPHIN% -b -e %ROM%</command>
+                  <platform>gc</platform><theme>gc</theme>
+                </system>
+              </systemList>
             '';
           };
           xdg.desktopEntries = {

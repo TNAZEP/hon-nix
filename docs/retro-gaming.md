@@ -3,7 +3,7 @@
 The first implementation provides native ES-DE with the pinned iiSU Interpreted
 theme, RetroArch cores for FDS/NES, N64 and GBA, and standalone Dolphin for
 GameCube. Shipwright and 2Ship2Harkinian remain installed. Broader platform
-coverage, controller acceptance testing and CRT presets are still in progress.
+coverage, controller acceptance testing and presentation tuning are still in progress.
 
 The `retro` capability owns its system packages and Home Manager configuration.
 Midgar receives it through `gaming`. Hosts may set `hon.retro.enable = false`
@@ -78,6 +78,37 @@ RetroArch's directory settings to choose a different BIOS location and save the
 configuration explicitly. Existing saves must be located and integrated before
 playing a game for which prior progress matters.
 
+## Presentation
+
+FDS and N64 offer Mega Bezel's standard Guest-based CRT presentation by default;
+GBA offers an LCD grid with GBA colour correction. Each has an **Unfiltered**
+alternative in ES-DE's emulator selection. GameCube continues to use Dolphin's
+native rendering; a comparable standalone CRT pipeline is still pending.
+
+Manual launches can select the same presentation:
+
+```sh
+retro-play --profile n64 --presentation crt [RetroArch arguments]
+retro-play --presentation gba-lcd [RetroArch arguments]
+retro-play --presentation raw [RetroArch arguments]
+```
+
+These options must precede ordinary RetroArch arguments. Omitting presentation
+preserves the writable base settings. The CRT choice fills the output viewport
+and lets Mega Bezel maintain the inner image ratio; LCD and unfiltered choices
+use the core's ratio. Do not copy the CRT viewport setting to other pipelines.
+The CRT intro is disabled and reflections are reduced. These are starting
+presets, with PVM tuning, real-game performance and actual-display review pending.
+
+Shader assets are pinned under `~/.local/share/hon-retro/shaders/pinned`.
+Save experiments beside that link, rather than inside the immutable asset tree.
+New base configurations use the writable parent as their shader directory.
+Explicit presentation launches select their preset each time; save a custom
+preset and pass a later `--set-shader /path/to/custom.slangp` to test it before
+promoting the changes into Nix. Menu parameter changes remain available during
+the current session. Managed launches disable the separate Qt desktop companion;
+RetroArch's controller menu remains available.
+
 ## Controllers
 
 The current verified device modes are:
@@ -144,6 +175,18 @@ unavailable roots, recursive mappings and preservation of settings/saves. The
 frontend test launches the real theme in isolated headless Wayland and routes
 a synthetic game to an inert command. It does not run copyrighted content,
 validate an emulator, test physical controllers or measure GPU performance.
+
+The optional manual rendering check opens short-lived Vulkan windows inside a
+Wayland desktop, uses generated test images, and keeps all settings temporary:
+
+```sh
+python tests/retro-render.py /path/to/retro-play /tmp/retro-render-check
+```
+
+It requires a new output directory and records logs and screenshots for CRT,
+GBA LCD and unfiltered output. It checks shader compilation, successful exit and
+base-config preservation. These pipelines passed on the RX 9070 XT; that is not
+a game-performance benchmark or evidence of calibrated PVM reproduction.
 
 Physical acceptance must cover controller navigation, missing/reconnected
 controllers, native GameCube adapter trigger/rumble behaviour, DolphinBar IR and
