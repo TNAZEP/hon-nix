@@ -9,6 +9,16 @@
     let
       frontend = pkgs.callPackage ../../../pkgs/es-de.nix { };
       theme = pkgs.callPackage ../../../pkgs/iisu-interpreted.nix { };
+      nativeEmulators = lib.optionalAttrs config.hon.retro.standalone.enable {
+        PCSX2 = pkgs.pcsx2;
+        XEMU = pkgs.xemu;
+        MELONDS = pkgs.melonds;
+        PPSSPP = pkgs.ppsspp;
+        RPCS3 = pkgs.rpcs3;
+        XENIA = pkgs.xenia-canary;
+        CEMU = pkgs.cemu;
+        AZAHAR = pkgs.azahar;
+      };
       controllerProfiles = pkgs.runCommand "retro-controller-profiles" { } ''
         mkdir -p "$out"
         cp -rs ${pkgs.retroarch-joypad-autoconfig}/share/libretro/autoconfig/. "$out/"
@@ -190,6 +200,16 @@
           exec ${lib.getExe pkgs.dolphin-emu} "''${adapter_args[@]}" "$@"
         '';
       };
+      xenia = pkgs.writeShellApplication {
+        name = "retro-xenia";
+        text = ''
+          data_dir="''${XDG_DATA_HOME:-$HOME/.local/share}/hon-retro/xenia"
+          cache_dir="''${XDG_CACHE_HOME:-$HOME/.cache}/hon-retro/xenia"
+          mkdir -p "$data_dir" "$cache_dir"
+          exec ${lib.getExe pkgs.xenia-canary} \
+            "--storage_root=$data_dir" "--cache_root=$cache_dir" --discord=false "$@"
+        '';
+      };
       findRules = pkgs.writeText "retro-es-find-rules.xml" ''
         <?xml version="1.0"?>
         <ruleList>
@@ -202,6 +222,15 @@
           <emulator name="DOLPHIN">
             <rule type="staticpath"><entry>${lib.getExe dolphin}</entry></rule>
           </emulator>
+          ${lib.concatStringsSep "\n" (
+            lib.mapAttrsToList (name: package: ''
+              <emulator name="${name}">
+              <rule type="staticpath"><entry>${
+                lib.getExe (if name == "XENIA" then xenia else package)
+              }</entry></rule>
+              </emulator>
+            '') nativeEmulators
+          )}
         </ruleList>
       '';
     in
@@ -219,6 +248,11 @@
           ];
           description = "RetroArch cores installed with the retro environment.";
         };
+        standalone.enable =
+          lib.mkEnableOption "additional native PS2, Xbox, DS, PSP, PS3, Xbox 360, Wii U and 3DS emulators"
+          // {
+            default = true;
+          };
       };
       config = lib.mkIf config.hon.retro.enable {
         environment.systemPackages =
@@ -236,7 +270,9 @@
             home
             console
             dolphin
-          ];
+          ]
+          ++ lib.attrValues nativeEmulators
+          ++ lib.optional config.hon.retro.standalone.enable xenia;
         # Dolphin ships upstream USB access rules for the Wii U GameCube adapter.
         services.udev.packages = [ pkgs.dolphin-emu ];
         home-manager.users.${config.hon.user.username} = {
@@ -281,6 +317,17 @@
                   <command label="Dolphin (Configured)">%EMULATOR_DOLPHIN% --adapter configured -b -e %ROM%</command>
                   <platform>gc</platform><theme>gc</theme>
                 </system>
+                <system>
+                  <name>wii</name><fullname>Nintendo Wii</fullname>
+                  <path>%ROMPATH%/wii</path>
+                  <extension>.iso .ISO .rvz .RVZ .wbfs .WBFS .gcz .GCZ .wia .WIA .ciso .CISO .dol .DOL .elf .ELF .wad .WAD</extension>
+                  <command label="Dolphin (Standalone)">%EMULATOR_DOLPHIN% -b -e %ROM%</command>
+                  <command label="Dolphin (Configured)">%EMULATOR_DOLPHIN% --adapter configured -b -e %ROM%</command>
+                  <platform>wii</platform><theme>wii</theme>
+                </system>
+                ${lib.optionalString config.hon.retro.standalone.enable (
+                  builtins.readFile ./retro/es_standalone_systems.xml
+                )}
               </systemList>
             '';
           };

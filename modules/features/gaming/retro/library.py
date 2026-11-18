@@ -16,6 +16,15 @@ ALIASES = {
     "n64": ["n64", "N64"],
     "gba": ["gba", "GBA"],
     "gc": ["gc", "GC", "GameCube"],
+    "wii": ["wii", "Wii", "WII"],
+    "ps2": ["ps2", "PS2"],
+    "xbox": ["xbox", "Xbox", "XBOX"],
+    "nds": ["nds", "NDS", "DS"],
+    "psp": ["psp", "PSP"],
+    "ps3": ["ps3", "PS3"],
+    "xbox360": ["xbox360", "Xbox360", "Xbox 360", "XBOX360"],
+    "wiiu": ["wiiu", "WiiU", "Wii U", "WIIU"],
+    "n3ds": ["n3ds", "N3DS", "3DS"],
 }
 
 

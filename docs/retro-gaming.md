@@ -1,13 +1,45 @@
 # Retro gaming
 
-The first implementation provides native ES-DE with the pinned iiSU Interpreted
-theme, RetroArch cores for FDS/NES, N64 and GBA, and standalone Dolphin for
-GameCube. Shipwright and 2Ship2Harkinian remain installed. Broader platform
-coverage, controller acceptance testing and presentation tuning are still in progress.
+The environment provides native ES-DE with the pinned iiSU Interpreted theme,
+RetroArch cores for FDS/NES, N64 and GBA, and standalone Dolphin for GameCube/Wii.
+Additional native launch routes cover PS2, Xbox, DS, PSP, PS3, Xbox 360, Wii U and
+3DS. Shipwright and 2Ship2Harkinian remain installed. Package builds and frontend
+routes are verified; game compatibility, broader classic coverage, controller
+acceptance and presentation tuning remain in progress.
 
 The `retro` capability owns its system packages and Home Manager configuration.
 Midgar receives it through `gaming`. Hosts may set `hon.retro.enable = false`
 or override `hon.retro.cores` with a list of `pkgs.libretro` packages.
+Set `hon.retro.standalone.enable = false` to omit the eight additional standalone
+emulators and their custom frontend routes, retaining Dolphin and the core set.
+
+## Native emulator setup
+
+| Platform | Emulator | Initial setup / current limit |
+| --- | --- | --- |
+| GameCube / Wii | Dolphin | Native GC adapter selection is automatic; real Wii Remote, IR and game profiles still need testing |
+| PS2 | PCSX2 | Supply a dumped PS2 BIOS and complete initial setup |
+| Xbox | xemu | Supply MCPX, compatible flash BIOS and HDD data; games need xemu-compatible disc images |
+| DS | melonDS | Review firmware/BIOS and boot-mode requirements; touch/mic and dual-screen layouts need testing |
+| PSP | PPSSPP | No external BIOS for normal use; controller and fullscreen acceptance pending |
+| PS3 | RPCS3 | Install required PS3 firmware yourself; configure content and licenses where applicable |
+| Xbox 360 | Native Xenia Canary | Experimental native Linux route; title-specific compatibility and save persistence need testing |
+| Wii U | Cemu | Supply dumped games and required keys; GamePad/motion profiles remain pending |
+| 3DS | Azahar | Use supported decrypted content; CIA installation stays in Azahar's own UI |
+
+Open the native emulator directly to complete setup before launching firmware-
+dependent games from ES-DE. Firmware, keys and credentials are never supplied by
+Nix or downloaded automatically. The frontend routes do not complete these setup
+wizards. Switch, Vita and PS4 integration remains pending; Xbox One has no route.
+PS3 directory entries currently need `.ps3dir` names in the separate library view;
+automatic per-game aliases for ordinary dump folders remain pending. Do not
+rename original dump folders to meet frontend naming conventions.
+Standalone CRT parity, RetroAchievements support and controller policy must be
+validated per emulator. The additional native emulators retain their own writable
+settings and save locations. `retro-xenia` explicitly uses
+`~/.local/share/hon-retro/xenia` for persistent data and
+`~/.cache/hon-retro/xenia` for cache, respecting XDG overrides, with Discord
+presence disabled. No source library paths enter these defaults.
 
 ## Library and launch
 
@@ -19,8 +51,10 @@ retro-library set-root "/path/to/ROMs"
 retro-home
 ```
 
-The current folder aliases are `FDS`/`fds`, `N64`/`n64`, `GBA`/`gba`, and
-`GC`/`gc`/`GameCube`. To use a different location or resolve ambiguous names:
+Initial aliases include `FDS`/`fds`, `N64`/`n64`, `GBA`/`gba`, and
+`GC`/`gc`/`GameCube`. Additional aliases cover Wii, PS2, Xbox, DS/NDS, PSP, PS3,
+Xbox 360, Wii U and 3DS/N3DS; `retro-library map --help` lists canonical system
+names. To use a different location or resolve ambiguous names:
 
 ```sh
 retro-library map gc "/path/to/GameCube games"

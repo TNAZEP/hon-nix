@@ -5,6 +5,9 @@ let
   disabled = flake.nixosConfigurations.midgar.extendModules {
     modules = [ { hon.retro.enable = false; } ];
   };
+  coreOnly = flake.nixosConfigurations.midgar.extendModules {
+    modules = [ { hon.retro.standalone.enable = false; } ];
+  };
   play = pkgs.lib.findFirst (
     package: pkgs.lib.getName package == "retro-play"
   ) (throw "retro-play is missing") config.environment.systemPackages;
@@ -12,6 +15,14 @@ in
 assert home.xdg.dataFile ? "hon-retro/frontend/themes/iisu-interpreted-es-de";
 assert home.xdg.desktopEntries ? retro-home;
 assert home.xdg.desktopEntries ? retro-console;
+assert
+  !(pkgs.lib.hasInfix "<name>ps3</name>"
+    coreOnly.config.home-manager.users.${config.hon.user.username}.xdg.dataFile."hon-retro/frontend/custom_systems/es_systems.xml".text
+  );
+assert
+  !(pkgs.lib.any (
+    package: pkgs.lib.getName package == "rpcs3"
+  ) coreOnly.config.environment.systemPackages);
 assert
   !(disabled.config.home-manager.users.${config.hon.user.username}.xdg.desktopEntries ? retro-home);
 pkgs.runCommand "hon-retro-library-checks"
@@ -23,6 +34,9 @@ pkgs.runCommand "hon-retro-library-checks"
   }
   ''
     python ${./retro.py} ${../modules/features/gaming/retro/library.py}
+    python ${./retro-frontends.py} \
+      ${home.xdg.dataFile."hon-retro/frontend/custom_systems/es_systems.xml".source} \
+      ${home.xdg.dataFile."hon-retro/frontend/custom_systems/es_find_rules.xml".source}
     export XDG_CONFIG_HOME="$TMPDIR/config"
     export XDG_DATA_HOME="$TMPDIR/data"
     retro-play --version

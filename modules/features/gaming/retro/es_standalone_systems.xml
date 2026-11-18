@@ -1,0 +1,56 @@
+<system>
+  <name>ps2</name><fullname>Sony PlayStation 2</fullname>
+  <path>%ROMPATH%/ps2</path>
+  <extension>.iso .ISO .chd .CHD .bin .BIN .cso .CSO .zso .ZSO .elf .ELF .gz .GZ</extension>
+  <command label="PCSX2 (Standalone)">%EMULATOR_PCSX2% -batch %ROM%</command>
+  <platform>ps2</platform><theme>ps2</theme>
+</system>
+<system>
+  <name>xbox</name><fullname>Microsoft Xbox</fullname>
+  <path>%ROMPATH%/xbox</path>
+  <extension>.iso .ISO .xiso .XISO</extension>
+  <command label="xemu (Standalone)">%EMULATOR_XEMU% -dvd_path %ROM%</command>
+  <platform>xbox</platform><theme>xbox</theme>
+</system>
+<system>
+  <name>nds</name><fullname>Nintendo DS</fullname>
+  <path>%ROMPATH%/nds</path>
+  <extension>.nds .NDS .dsi .DSI .srl .SRL</extension>
+  <command label="melonDS (Standalone)">%EMULATOR_MELONDS% -f %ROM%</command>
+  <platform>nds</platform><theme>nds</theme>
+</system>
+<system>
+  <name>psp</name><fullname>Sony PlayStation Portable</fullname>
+  <path>%ROMPATH%/psp</path>
+  <extension>.iso .ISO .cso .CSO .chd .CHD .pbp .PBP .elf .ELF</extension>
+  <command label="PPSSPP (Standalone)">%EMULATOR_PPSSPP% --fullscreen %ROM%</command>
+  <platform>psp</platform><theme>psp</theme>
+</system>
+<system>
+  <name>ps3</name><fullname>Sony PlayStation 3</fullname>
+  <path>%ROMPATH%/ps3</path>
+  <extension>.ps3dir .PS3DIR .iso .ISO</extension>
+  <command label="RPCS3 Directory or ISO (Standalone)">%EMULATOR_RPCS3% --no-gui --fullscreen %ROM%</command>
+  <platform>ps3</platform><theme>ps3</theme>
+</system>
+<system>
+  <name>xbox360</name><fullname>Microsoft Xbox 360</fullname>
+  <path>%ROMPATH%/xbox360</path>
+  <extension>.iso .ISO .xex .XEX</extension>
+  <command label="Xenia Canary (Native, Experimental)">%EMULATOR_XENIA% %ROM%</command>
+  <platform>xbox360</platform><theme>xbox360</theme>
+</system>
+<system>
+  <name>wiiu</name><fullname>Nintendo Wii U</fullname>
+  <path>%ROMPATH%/wiiu</path>
+  <extension>.rpx .RPX .wua .WUA .wud .WUD .wux .WUX .tmd .TMD .elf .ELF</extension>
+  <command label="Cemu (Standalone)">%EMULATOR_CEMU% -f -g %ROM%</command>
+  <platform>wiiu</platform><theme>wiiu</theme>
+</system>
+<system>
+  <name>n3ds</name><fullname>Nintendo 3DS</fullname>
+  <path>%ROMPATH%/n3ds</path>
+  <extension>.cci .CCI .cxi .CXI .3dsx .3DSX .app .APP .elf .ELF .axf .AXF .zcci .ZCCI .zcxi .ZCXI .z3dsx .Z3DSX</extension>
+  <command label="Azahar (Standalone)">%EMULATOR_AZAHAR% --fullscreen %ROM%</command>
+  <platform>n3ds</platform><theme>n3ds</theme>
+</system>

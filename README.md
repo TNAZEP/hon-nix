@@ -110,8 +110,9 @@ synchronization is disabled to avoid competing runtime settings updates.
 
 ## Retro gaming
 
-The retro feature integrates native ES-DE with iiSU Interpreted, standalone
-Dolphin and selected RetroArch cores. Library paths and frontend preferences
+The retro feature integrates native ES-DE with iiSU Interpreted, native emulator
+routes through PS3/Xbox 360 and Wii U/3DS, selected RetroArch cores, and initial
+CRT/LCD presentation. Library paths and frontend preferences
 remain writable runtime settings. See [retro gaming](docs/retro-gaming.md) for
 setup, persistent-data locations, validation and the current implementation limits.
 

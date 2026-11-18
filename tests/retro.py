@@ -80,6 +80,18 @@ class LibraryTest(unittest.TestCase):
         self.run_cli("set-root", self.root)
         self.assertEqual((self.view / "gba").resolve(), self.root / "GBA")
 
+    def test_additional_platform_aliases_preserve_original_folders(self):
+        folders = {"wii": "Wii", "ps2": "PS2", "xbox": "Xbox", "nds": "DS",
+                   "psp": "PSP", "ps3": "PS3", "xbox360": "Xbox 360",
+                   "wiiu": "Wii U", "n3ds": "3DS"}
+        for folder in folders.values():
+            (self.root / folder).mkdir()
+        before = sorted(p.name for p in self.root.iterdir())
+        self.run_cli("set-root", self.root)
+        for system, folder in folders.items():
+            self.assertEqual((self.view / system).resolve(), self.root / folder)
+        self.assertEqual(sorted(p.name for p in self.root.iterdir()), before)
+
     def test_foreign_symlink_is_preserved(self):
         self.view.mkdir(parents=True)
         other = self.base / "other"
