@@ -6,7 +6,8 @@
     };
     # Keep older JDKs accessible without competing for bin/java and bin/javac.
     environment.etc = {
-      "jdks/8".source = pkgs.zulu8;
+      # Java 8's optional GTK look-and-feel pulls in retired GTK2.
+      "jdks/8".source = pkgs.zulu8.override { gtkSupport = false; };
       "jdks/17".source = pkgs.zulu17;
       "jdks/21".source = pkgs.zulu21;
       "jdks/25".source = pkgs.zulu25;

@@ -77,7 +77,7 @@ let
           builtins.all
             (jdk: !(builtins.elem jdk.name (map (package: package.name) config.environment.systemPackages)))
             [
-              hostPkgs.zulu8
+              (hostPkgs.zulu8.override { gtkSupport = false; })
               hostPkgs.zulu17
               hostPkgs.zulu21
             ]
@@ -88,7 +88,7 @@ let
             "21"
             "25"
           ] == map toString [
-            hostPkgs.zulu8
+            (hostPkgs.zulu8.override { gtkSupport = false; })
             hostPkgs.zulu17
             hostPkgs.zulu21
             hostPkgs.zulu25

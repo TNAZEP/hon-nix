@@ -36,6 +36,7 @@
         (inputs.import-tree.filter (path: builtins.baseNameOf path == "default.nix") ./hosts)
       ];
       perSystem = { pkgs, ... }: {
+        packages.capture-view = pkgs.callPackage ./pkgs/capture-view.nix { };
         formatter = pkgs.nixfmt-tree;
         checks.maintenance = import ./tests/maintenance.nix { inherit pkgs; };
         checks.foundation = import ./tests/foundation.nix {
