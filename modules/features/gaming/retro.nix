@@ -156,6 +156,40 @@
             ${lib.getExe home} "$@"
         '';
       };
+      dolphin = pkgs.writeShellApplication {
+        name = "retro-dolphin";
+        text = ''
+          adapter_mode=auto
+          if [[ "''${1:-}" == --adapter ]]; then
+            case "''${2:-}" in
+              auto|native|configured) adapter_mode="$2" ;;
+              *) echo 'retro-dolphin: expected --adapter auto, native or configured' >&2; exit 2 ;;
+            esac
+            shift 2
+          fi
+          native_adapter=false
+          if [[ "$adapter_mode" == native ]]; then
+            native_adapter=true
+          elif [[ "$adapter_mode" == auto ]]; then
+            for device in /sys/bus/usb/devices/*; do
+              if [[ -r "$device/idVendor" && -r "$device/idProduct" ]] &&
+                 [[ "$(<"$device/idVendor")" == 057e && "$(<"$device/idProduct")" == 0337 ]]; then
+                native_adapter=true
+                break
+              fi
+            done
+          fi
+          adapter_args=()
+          if "$native_adapter"; then
+            export SDL_JOYSTICK_HIDAPI_GAMECUBE=0
+            # Dolphin's command-line layer never saves these port overrides.
+            for port in 0 1 2 3; do
+              adapter_args+=(-C "Dolphin.Core.SIDevice$port=12")
+            done
+          fi
+          exec ${lib.getExe pkgs.dolphin-emu} "''${adapter_args[@]}" "$@"
+        '';
+      };
       findRules = pkgs.writeText "retro-es-find-rules.xml" ''
         <?xml version="1.0"?>
         <ruleList>
@@ -166,7 +200,7 @@
             <rule type="corepath"><entry>${retroarch}/lib/retroarch/cores</entry></rule>
           </core>
           <emulator name="DOLPHIN">
-            <rule type="staticpath"><entry>${lib.getExe pkgs.dolphin-emu}</entry></rule>
+            <rule type="staticpath"><entry>${lib.getExe dolphin}</entry></rule>
           </emulator>
         </ruleList>
       '';
@@ -201,6 +235,7 @@
             play
             home
             console
+            dolphin
           ];
         # Dolphin ships upstream USB access rules for the Wii U GameCube adapter.
         services.udev.packages = [ pkgs.dolphin-emu ];
@@ -243,6 +278,7 @@
                   <path>%ROMPATH%/gc</path>
                   <extension>.gcm .GCM .iso .ISO .rvz .RVZ .gcz .GCZ .wia .WIA .ciso .CISO .dol .DOL .elf .ELF .m3u .M3U</extension>
                   <command label="Dolphin (Standalone)">%EMULATOR_DOLPHIN% -b -e %ROM%</command>
+                  <command label="Dolphin (Configured)">%EMULATOR_DOLPHIN% --adapter configured -b -e %ROM%</command>
                   <platform>gc</platform><theme>gc</theme>
                 </system>
               </systemList>

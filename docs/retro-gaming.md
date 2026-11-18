@@ -117,6 +117,7 @@ The current verified device modes are:
 | --- | --- | --- |
 | 8BitDo 64, Bluetooth | `2dc8:3019` | A/B, all four C buttons, L/R/Z, Select/Start/Home, full stick range and D-pad verified; no SDL-advertised rumble in this mode |
 | Ultimate 2 Wireless, dongle D-input | `2dc8:6012` | Face/shoulder/system/stick buttons, four extra inputs, both sticks, analog triggers and D-pad verified; both rumble motors confirmed by the user |
+| Original GameCube controller, official USB adapter | `057e:0337` | Native USB access, port 1, face/system buttons, D-pad, both sticks, separate analog trigger travel/digital L/R clicks, and sustained rumble verified; gameplay checks pending |
 
 RetroArch normally requests the Ultimate for player one; N64 launches request
 the 64 instead. Both use RetroArch's native VID/PID preference, rather than a
@@ -146,6 +147,19 @@ The frontend disables SDL's GameCube HIDAPI driver so it does not claim the
 official adapter that Dolphin needs for native USB access. Use another pad to
 navigate the frontend while using native GameCube adapter mode in Dolphin.
 No broad input-group access or new kernel controller driver is introduced.
+
+`retro-dolphin` detects the official adapter at launch and temporarily selects
+Dolphin's native adapter type for all four ports. Physical adapter ports retain
+their order. If no adapter is present, it uses Dolphin's saved port settings.
+The **Dolphin (Configured)** frontend alternative bypasses automatic selection.
+For manual launches, `--adapter native` forces native ports even if the adapter
+will be plugged in later, and `--adapter configured` preserves the saved choices.
+These overrides use Dolphin's command-line layer; they do not rewrite port
+settings in Dolphin.ini. Emulator-level hotplug, multiplayer and gameplay still
+need acceptance tests. The Pro 3 mapping awaits its physical test.
+Both adapter USB plugs are needed for rumble: the grey plug supplies motor power.
+With it connected, the user confirmed normal sustained rumble during a five-second
+native USB test. Short-pulse tests had been inconclusive.
 
 ## Packaging and updates
 
