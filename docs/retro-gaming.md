@@ -31,9 +31,12 @@ Open the native emulator directly to complete setup before launching firmware-
 dependent games from ES-DE. Firmware, keys and credentials are never supplied by
 Nix or downloaded automatically. The frontend routes do not complete these setup
 wizards. Switch, Vita and PS4 integration remains pending; Xbox One has no route.
-PS3 directory entries currently need `.ps3dir` names in the separate library view;
-automatic per-game aliases for ordinary dump folders remain pending. Do not
-rename original dump folders to meet frontend naming conventions.
+PS3 disc dumps receive `.ps3dir` aliases in a separate managed view; original
+folder names remain unchanged. Discovery recognizes complete disc layouts with
+`PS3_GAME/PARAM.SFO` and `PS3_GAME/USRDIR/EBOOT.BIN` at the platform root or one
+directory below it. ISO entries retain their names. Incomplete dumps and other
+directory layouts are not automatically indexed. Installed PSN titles still use
+RPCS3's own library; this does not install games, firmware or licenses.
 Standalone CRT parity, RetroAchievements support and controller policy must be
 validated per emulator. The additional native emulators retain their own writable
 settings and save locations. `retro-xenia` explicitly uses
@@ -89,6 +92,7 @@ frontend survive rebuilds. The following paths use XDG defaults, respecting
 | --- | --- |
 | Library directory preferences | `~/.config/hon-retro/library.json` |
 | Library view | `~/.local/share/hon-retro/roms/` |
+| PS3 per-game aliases / ownership manifest | `~/.local/share/hon-retro/ps3/` and `ps3-view.json` |
 | Frontend settings, metadata, artwork and logs | `~/.local/share/hon-retro/frontend/` |
 | RetroArch writable base configuration | `~/.config/hon-retro/retroarch.cfg` |
 | RetroArch saves / states | `~/.local/share/hon-retro/saves/` and `states/` |
@@ -223,6 +227,9 @@ unavailable roots, recursive mappings and preservation of settings/saves. The
 frontend test launches the real theme in isolated headless Wayland and routes
 a synthetic game to an inert command. It does not run copyrighted content,
 validate an emulator, test physical controllers or measure GPU performance.
+PS3 view tests also cover ordinary dump-folder aliases, ISO preservation, name
+collisions, single-dump mappings, missing sources and upgrading the previous
+platform-root link without modifying frontend metadata.
 
 The optional manual rendering check opens short-lived Vulkan windows inside a
 Wayland desktop, uses generated test images, and keeps all settings temporary:

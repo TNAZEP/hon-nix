@@ -21,8 +21,10 @@ pkgs.runCommand "hon-retro-frontend-checks"
   ''
     export __EGL_VENDOR_LIBRARY_FILENAMES=${pkgs.mesa}/share/glvnd/egl_vendor.d/50_mesa.json
     export LIBGL_DRIVERS_PATH=${pkgs.mesa}/lib/dri
-    dbus-run-session --config-file=${pkgs.dbus}/share/dbus-1/session.conf -- python ${./retro-ui.py} \
-      ${frontend}/bin/es-de \
-      ${theme}/share/es-de/themes/iisu-interpreted-es-de \
-      ${../modules/features/gaming/retro/library.py} "$out"
+    for platform in gba ps3; do
+      dbus-run-session --config-file=${pkgs.dbus}/share/dbus-1/session.conf -- python ${./retro-ui.py} \
+        ${frontend}/bin/es-de \
+        ${theme}/share/es-de/themes/iisu-interpreted-es-de \
+        ${../modules/features/gaming/retro/library.py} "$out/$platform" "$platform"
+    done
   ''

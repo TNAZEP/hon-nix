@@ -18,9 +18,11 @@ def wait_for(predicate, label, timeout=30):
     raise AssertionError(f"Timed out: {label}")
 
 
-frontend, theme, library, output = map(Path, sys.argv[1:])
+frontend, theme, library, output = map(Path, sys.argv[1:5])
+platform = sys.argv[5] if len(sys.argv) > 5 else "gba"
+assert platform in ("gba", "ps3")
 output.mkdir(parents=True)
-base = Path.cwd() / "fixture"
+base = Path.cwd() / f"fixture-{platform}"
 base.mkdir()
 runtime = base / "run"
 runtime.mkdir(mode=0o700)
@@ -30,10 +32,17 @@ os.environ.update(
     WLR_BACKENDS="headless", WLR_HEADLESS_OUTPUTS="1", WLR_RENDERER="pixman",
     LIBGL_ALWAYS_SOFTWARE="1", SDL_VIDEODRIVER="wayland", SDL_AUDIODRIVER="dummy",
 )
-roms = base / "My Stuff/ROMS/GBA"
+roms = base / "My Stuff/ROMS" / platform.upper()
 roms.mkdir(parents=True)
-game = roms / "Fixture Game.gba"
-game.write_bytes(b"inert test file, not a game")
+if platform == "ps3":
+    game = roms / "Fixture Game"
+    fixture_file = game / "PS3_GAME/USRDIR/EBOOT.BIN"
+    fixture_file.parent.mkdir(parents=True)
+    (game / "PS3_GAME/PARAM.SFO").write_bytes(b"inert metadata")
+else:
+    game = roms / "Fixture Game.gba"
+    fixture_file = game
+fixture_file.write_bytes(b"inert test file, not a game")
 subprocess.run([sys.executable, str(library), "set-root", str(roms.parent)], check=True)
 subprocess.run([sys.executable, str(library), "prepare"], check=True)
 app = base / "data/hon-retro/frontend"
@@ -53,8 +62,9 @@ systems = ET.Element("systemList")
 ET.SubElement(systems, "loadExclusive")
 system = ET.SubElement(systems, "system")
 for key, value in {
-    "name": "gba", "fullname": "Game Boy Advance", "path": "%ROMPATH%/gba",
-    "extension": ".gba", "command": f'"{stub}" %ROM%', "platform": "gba", "theme": "gba",
+    "name": platform, "fullname": "PlayStation 3" if platform == "ps3" else "Game Boy Advance",
+    "path": f"%ROMPATH%/{platform}", "extension": ".ps3dir" if platform == "ps3" else ".gba",
+    "command": f'"{stub}" %ROM%', "platform": platform, "theme": platform,
 }.items():
     ET.SubElement(system, key).text = value
 ET.ElementTree(systems).write(custom / "es_systems.xml")
@@ -92,7 +102,7 @@ try:
     time.sleep(2)
     assert processes[-1].poll() is None, "Frontend exited instead of returning to library"
     subprocess.run(["grim", str(output / "returned.png")], check=True)
-    assert game.read_bytes() == b"inert test file, not a game"
+    assert fixture_file.read_bytes() == b"inert test file, not a game"
     log_files = list((app / "logs").glob("*.txt"))
     for path in log_files:
         (output / path.name).write_text(path.read_text())

@@ -89,8 +89,86 @@ class LibraryTest(unittest.TestCase):
         before = sorted(p.name for p in self.root.iterdir())
         self.run_cli("set-root", self.root)
         for system, folder in folders.items():
-            self.assertEqual((self.view / system).resolve(), self.root / folder)
+            target = self.base / "data/hon-retro/ps3" if system == "ps3" else self.root / folder
+            self.assertEqual((self.view / system).resolve(), target)
         self.assertEqual(sorted(p.name for p in self.root.iterdir()), before)
+
+    def ps3_dump(self, name="Example Game"):
+        game = self.root / "PS3" / name
+        (game / "PS3_GAME/USRDIR").mkdir(parents=True)
+        (game / "PS3_GAME/PARAM.SFO").write_bytes(b"inert metadata fixture")
+        (game / "PS3_GAME/USRDIR/EBOOT.BIN").write_bytes(b"inert executable fixture")
+        return game
+
+    def test_ps3_dump_and_iso_view_preserves_originals(self):
+        game = self.ps3_dump()
+        disc = game.parent / "Disc Game.ISO"
+        disc.write_bytes(b"inert disc fixture")
+        self.run_cli("set-root", self.root)
+        self.assertEqual((self.view / "ps3/Example Game.ps3dir").resolve(), game)
+        self.assertEqual((self.view / "ps3/Disc Game.ISO").resolve(), disc)
+        self.assertEqual(sorted(p.name for p in game.parent.iterdir()), ["Disc Game.ISO", "Example Game"])
+        self.assertEqual((game / "PS3_GAME/USRDIR/EBOOT.BIN").read_bytes(), b"inert executable fixture")
+        self.run_cli("refresh")
+        self.assertEqual(disc.read_bytes(), b"inert disc fixture")
+
+    def test_single_ps3_dump_mapping_and_disconnected_preservation(self):
+        game = self.ps3_dump("Already Named.ps3dir")
+        self.run_cli("map", "ps3", game)
+        link = self.view / "ps3/Already Named.ps3dir"
+        self.assertEqual(link.resolve(), game)
+        game.rename(game.with_name("disconnected"))
+        self.run_cli("refresh", success=False)
+        self.assertTrue(link.is_symlink())
+
+    def test_existing_ps3_root_link_upgrades_without_changing_metadata(self):
+        game = self.ps3_dump()
+        self.view.mkdir(parents=True)
+        (self.view / "ps3").symlink_to(game.parent, target_is_directory=True)
+        manifest = self.view.parent / "library-view.json"
+        manifest.write_text(json.dumps({"ps3": str(game.parent)}))
+        metadata = self.view.parent / "frontend/gamelists/ps3/gamelist.xml"
+        metadata.parent.mkdir(parents=True)
+        metadata.write_text("user metadata must survive\n")
+        self.run_cli("set-root", self.root)
+        self.assertEqual((self.view / "ps3/Example Game.ps3dir").resolve(), game)
+        self.assertEqual(metadata.read_text(), "user metadata must survive\n")
+        self.assertTrue(game.is_dir())
+
+    def test_ps3_collision_aborts_before_any_view_changes(self):
+        self.ps3_dump("Same Name")
+        self.ps3_dump("Same Name.ps3dir")
+        self.run_cli("set-root", self.root, success=False)
+        self.assertFalse(self.view.exists())
+        self.assertFalse((self.base / "data/hon-retro/ps3").exists())
+
+    def test_ps3_foreign_entry_and_global_conflict_preserve_both_views(self):
+        self.ps3_dump()
+        ps3_view = self.base / "data/hon-retro/ps3"
+        ps3_view.mkdir(parents=True)
+        foreign = ps3_view / "Example Game.ps3dir"
+        foreign.mkdir()
+        self.run_cli("set-root", self.root, success=False)
+        self.assertTrue(foreign.is_dir())
+        self.assertFalse(self.view.exists())
+        foreign.rmdir()
+        self.view.mkdir()
+        (self.view / "gba").mkdir()
+        self.run_cli("set-root", self.root, success=False)
+        self.assertEqual(list(ps3_view.iterdir()), [])
+
+    def test_symlinked_managed_view_is_rejected(self):
+        self.view.parent.mkdir(parents=True)
+        foreign = self.base / "foreign"
+        foreign.mkdir()
+        self.view.symlink_to(foreign, target_is_directory=True)
+        self.run_cli("set-root", self.root, success=False)
+        self.assertEqual(list(foreign.iterdir()), [])
+
+    def test_recursive_ps3_mapping_is_rejected(self):
+        index = self.base / "data/hon-retro/ps3"
+        index.mkdir(parents=True)
+        self.run_cli("map", "ps3", index, success=False)
 
     def test_foreign_symlink_is_preserved(self):
         self.view.mkdir(parents=True)

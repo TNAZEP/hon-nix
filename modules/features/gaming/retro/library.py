@@ -56,6 +56,57 @@ def directory(value):
     return str(path)
 
 
+def validate_source(view, source):
+    destination = view.resolve()
+    source = source.resolve()
+    if source == destination or destination in source.parents or source in destination.parents:
+        raise ValueError(f"Library mapping would create a recursive view: {source}")
+
+
+def validate_links(view, selected, previous):
+    if view.is_symlink() or (view.exists() and not view.is_dir()):
+        raise ValueError(f"Unmanaged view preserved: {view}")
+    for name, target in selected.items():
+        validate_source(view, Path(target))
+        link = view / name
+        if link.is_symlink():
+            if os.readlink(link) not in (previous.get(name), target):
+                raise ValueError(f"Unmanaged link preserved: {link}")
+        elif link.exists():
+            raise ValueError(f"Existing directory/file preserved: {link}")
+
+
+def update_links(view, selected, previous, manifest):
+    view.mkdir(parents=True, exist_ok=True)
+    for name, target in selected.items():
+        link = view / name
+        if link.is_symlink() and os.readlink(link) != target:
+            link.unlink()
+        if not link.is_symlink():
+            link.symlink_to(target, target_is_directory=Path(target).is_dir())
+    # Missing entries retain their old links and metadata, including disconnected media.
+    write_json(manifest, previous | selected)
+
+
+def ps3_entries(source):
+    def disc_dump(path):
+        return (path / "PS3_GAME/PARAM.SFO").is_file() and (path / "PS3_GAME/USRDIR/EBOOT.BIN").is_file()
+
+    candidates = [source] if disc_dump(source) else sorted(source.iterdir())
+    selected = {}
+    for path in candidates:
+        if path.is_dir() and disc_dump(path):
+            name = path.name if path.suffix.lower() == ".ps3dir" else path.name + ".ps3dir"
+        elif path.is_file() and path.suffix.lower() == ".iso":
+            name = path.name
+        else:
+            continue
+        if name in selected:
+            raise ValueError(f"Ambiguous PS3 entry: {name}")
+        selected[name] = str(path.resolve())
+    return selected
+
+
 def refresh(settings):
     _, data, _ = paths()
     view = data / "roms"
@@ -75,26 +126,25 @@ def refresh(settings):
             selected[system] = str(matches[0].resolve())
     manifest = data / "library-view.json"
     previous = json.loads(manifest.read_text()) if manifest.exists() else {}
-    # Check everything before touching the view. Never replace foreign entries.
-    for system, target in selected.items():
-        source = Path(target)
-        if source == view or view in source.parents or source in view.parents:
-            raise ValueError(f"Library mapping would create a recursive view: {source}")
-        link = view / system
-        if link.is_symlink():
-            if os.readlink(link) not in (previous.get(system), target):
-                raise ValueError(f"Unmanaged link preserved: {link}")
-        elif link.exists():
-            raise ValueError(f"Existing directory/file preserved: {link}")
-    view.mkdir(parents=True, exist_ok=True)
-    for system, target in selected.items():
-        link = view / system
-        if link.is_symlink() and os.readlink(link) != target:
-            link.unlink()
-        if not link.is_symlink():
-            link.symlink_to(target, target_is_directory=True)
-    # Missing systems retain their old link and metadata, including disconnected media.
-    write_json(manifest, previous | selected)
+    ps3_plan = None
+    if "ps3" in selected:
+        source = Path(selected["ps3"])
+        ps3_view = data / "ps3"
+        # Reject recursive source roots before inspecting their directory entries.
+        validate_links(ps3_view, {}, {})
+        validate_source(ps3_view, source)
+        validate_source(view, source)
+        ps3_manifest = data / "ps3-view.json"
+        ps3_previous = json.loads(ps3_manifest.read_text()) if ps3_manifest.exists() else {}
+        ps3_selected = ps3_entries(source)
+        validate_links(ps3_view, ps3_selected, ps3_previous)
+        ps3_plan = (ps3_view, ps3_selected, ps3_previous, ps3_manifest)
+        selected["ps3"] = str(ps3_view.resolve())
+    # Validate both levels before creating any links. Never replace foreign entries.
+    validate_links(view, selected, previous)
+    if ps3_plan:
+        update_links(*ps3_plan)
+    update_links(view, selected, previous, manifest)
     return view
 
 
