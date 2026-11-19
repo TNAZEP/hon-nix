@@ -27,7 +27,6 @@
       inputs.self.nixosModules.gaming
       inputs.self.nixosModules.libvirt
       inputs.self.nixosModules.docker
-      inputs.self.nixosModules.ai
       inputs.self.nixosModules.tailscale
       inputs.self.nixosModules.appimage
       {

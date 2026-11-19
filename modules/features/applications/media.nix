@@ -6,6 +6,8 @@
       kdePackages.kimageformats
       kdePackages.kdenlive
       kdePackages.kamoso
+      mpv
+      yt-dlp
       (pkgs.callPackage ../../../pkgs/capture-view.nix { })
     ];
   };

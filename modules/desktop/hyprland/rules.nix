@@ -33,7 +33,8 @@
           {
             name = "world-of-warcraft";
             match = {
-              class = "^steam_app_default$";
+              # Faugus assigns a launcher-specific steam_app_ ID.
+              class = "^steam_app_.*$";
               initial_title = "^World of Warcraft$";
             };
             monitor = primaryMonitor.name;
