@@ -56,7 +56,9 @@ original_files = {str(path.relative_to(roms)): path.read_bytes() for path in rom
 subprocess.run([sys.executable, str(library), "set-root", str(roms.parent)], check=True)
 subprocess.run([sys.executable, str(library), "prepare"], check=True)
 app = base / "data/hon-retro/frontend"
-os.environ["ESDE_APPDATA_DIR"] = str(app)
+# Exercise the installed entry's setup; pre-setting this would hide a bypass
+# of retro-home and reproduce neither the terminal nor desktop launch path.
+os.environ.pop("ESDE_APPDATA_DIR", None)
 (app / "themes").mkdir()
 (app / "themes/iisu-interpreted-es-de").symlink_to(theme)
 custom = app / "custom_systems"

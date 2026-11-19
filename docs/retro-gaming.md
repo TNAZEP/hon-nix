@@ -184,9 +184,12 @@ view. A conflicting unmanaged file or link causes an error instead of replacemen
 Library locations are runtime preferences and never enter the Nix store.
 
 Open **Retro Home** from the desktop launcher, or **Retro Console** for the same
-fullscreen frontend with idle inhibition. Both run inside the existing desktop;
-there is no new login session or change to the default desktop. ES-DE remains a
-normal application that can be switched away from. Console mode releases its
+fullscreen frontend with idle inhibition.
+The **ES-DE** menu entry and `es-de` command also use the prepared library and
+the same frontend settings as Retro Home.
+These launchers run inside the existing desktop; there is no new login session
+or change to the default desktop. ES-DE remains a normal application that can
+be switched away from. Console mode releases its
 idle inhibitor when the process exits; compositor-specific idle behaviour still
 needs testing on the actual desktop.
 

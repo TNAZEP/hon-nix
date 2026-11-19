@@ -232,6 +232,18 @@
           exec ${lib.getExe frontend} "$@"
         '';
       };
+      frontendEntry = pkgs.symlinkJoin {
+        name = "hon-retro-es-de";
+        paths = [ frontend ];
+        nativeBuildInputs = [ pkgs.makeWrapper ];
+        postBuild = ''
+          # The upstream desktop entry executes es-de. Route that command through
+          # library preparation too; retro-home calls the private raw binary.
+          rm "$out/bin/es-de"
+          makeWrapper ${lib.getExe home} "$out/bin/es-de"
+        '';
+        meta.mainProgram = "es-de";
+      };
       console = pkgs.writeShellApplication {
         name = "retro-console";
         text = ''
@@ -380,7 +392,7 @@
             gnome-disk-utility
           ])
           ++ [
-            frontend
+            frontendEntry
             retroarch
             library
             audit

@@ -2,7 +2,9 @@
 let
   config = flake.nixosConfigurations.midgar.config;
   home = config.home-manager.users.${config.hon.user.username};
-  frontend = pkgs.callPackage ../pkgs/es-de.nix { };
+  frontend = pkgs.lib.findFirst (
+    package: pkgs.lib.getName package == "hon-retro-es-de"
+  ) (throw "Configured ES-DE entry is missing") config.environment.systemPackages;
   # The theme has no blanket redistribution grant; use the host's existing policy.
   themePkgs = import pkgs.path {
     system = pkgs.stdenv.hostPlatform.system;
