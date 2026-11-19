@@ -285,6 +285,13 @@ RetroArch's controller menu remains available.
 
 ## Controllers
 
+ES-DE navigation uses Nintendo face-button positions: A on the right, B at the
+bottom, Y on the left and X at the top. New frontend settings select Switch Pro
+button prompts and enable **Swap the A/B and X/Y buttons**. These settings can
+be changed under **Input device settings**; they affect only frontend navigation.
+The packaged frontend keeps Nintendo prompt letters aligned with those swapped
+positions, so A still labels select and B labels back.
+
 The current verified device modes are:
 
 | Controller | Hardware ID | Observed behaviour |

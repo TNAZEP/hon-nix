@@ -50,6 +50,14 @@ stdenv.mkDerivation (finalAttrs: {
   ];
   cmakeFlags = [ (lib.cmakeBool "APPLICATION_UPDATER" false) ];
 
+  postPatch = ''
+    # Nintendo prompts already label the swapped physical positions. Keep those
+    # letters when InputSwapButtons moves the actions to the Nintendo layout.
+    substituteInPlace es-core/src/components/HelpComponent.cpp \
+      --replace-fail 'if (Settings::getInstance()->getBool("InputSwapButtons")) {' \
+      'if (Settings::getInstance()->getBool("InputSwapButtons") && controllerType != "switchpro" && controllerType != "snes") {'
+  '';
+
   meta = {
     description = "Controller-friendly game library frontend";
     homepage = "https://es-de.org";

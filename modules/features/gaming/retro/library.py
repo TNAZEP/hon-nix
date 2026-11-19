@@ -210,9 +210,11 @@ def prepare(settings):
             "ThemeColorScheme": "dark",
             "ThemeAspectRatio": "16:9",
             "CollectionSystemsAuto": "all,favorites,recent",
+            "InputControllerType": "switchpro",
         }.items():
             ET.SubElement(root, "string", name=key, value=value)
         ET.SubElement(root, "bool", name="ScraperOverwriteData", value="false")
+        ET.SubElement(root, "bool", name="InputSwapButtons", value="true")
         # Exclusive creation prevents replacing settings another launch just created.
         try:
             with config.open("xb") as f:
