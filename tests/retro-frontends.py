@@ -32,6 +32,8 @@ for name in ("psx", "saturn", "dreamcast", "pcenginecd", "neogeocd"):
     assert not {".bin", ".BIN", ".zip", ".ZIP", ".7z", ".7Z"} & set(extensions), name
 # Vertical arcade output retains the core's geometry until CRT rotation is tested.
 assert "--presentation raw" in systems.find("system[name='arcade']/command").text
+assert all("--profile ultimate2" in command.text
+           for command in systems.find("system[name='dreamcast']").findall("command"))
 arcade_commands = {command.attrib["label"]: command.text
                    for command in systems.find("system[name='arcade']").findall("command")}
 assert "--presentation crt-vertical -L" in arcade_commands["FinalBurn Neo (CRT Vertical CCW)"]

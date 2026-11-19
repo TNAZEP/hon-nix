@@ -91,8 +91,8 @@
   <name>dreamcast</name><fullname>Sega Dreamcast</fullname>
   <path>%ROMPATH%/dreamcast</path>
   <extension>.cdi .CDI .gdi .GDI .chd .CHD .cue .CUE .m3u .M3U</extension>
-  <command label="Flycast (CRT)">%EMULATOR_RETROARCH% --presentation crt -L %CORE_RETROARCH%/flycast_libretro.so %ROM%</command>
-  <command label="Flycast (Unfiltered)">%EMULATOR_RETROARCH% --presentation raw -L %CORE_RETROARCH%/flycast_libretro.so %ROM%</command>
+  <command label="Flycast (CRT)">%EMULATOR_RETROARCH% --profile ultimate2 --presentation crt -L %CORE_RETROARCH%/flycast_libretro.so %ROM%</command>
+  <command label="Flycast (Unfiltered)">%EMULATOR_RETROARCH% --profile ultimate2 --presentation raw -L %CORE_RETROARCH%/flycast_libretro.so %ROM%</command>
   <platform>dreamcast</platform><theme>dreamcast</theme>
 </system>
 <system>

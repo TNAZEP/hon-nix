@@ -25,6 +25,7 @@
         chmod u+w "$out/udev" "$out/sdl2"
         cp ${./retro/controllers/8bitdo-64-udev.cfg} "$out/udev/hon-8bitdo-64.cfg"
         cp ${./retro/controllers/ultimate2-sdl2.cfg} "$out/sdl2/hon-ultimate2.cfg"
+        cp ${./retro/controllers/8bitdo-310b-sdl2.cfg} "$out/sdl2/hon-8bitdo-310b.cfg"
       '';
       retroarchSettings = {
         config_save_on_exit = "false";
@@ -40,7 +41,7 @@
         joypad_autoconfig_dir = "${controllerProfiles}";
         input_joypad_driver = "sdl2";
         input_player1_device_reservation_type = "1";
-        input_player1_reserved_device = "2dc8:6012 8Bitdo Ultimate 2 Wireless Controller";
+        input_player1_reserved_device = "2dc8:310b 8BitDo Ultimate 2 Wireless Controller";
       };
       # RetroArch uses only the last --appendconfig argument, including the
       # one added by the nixpkgs wrapper. Profiles must retain its defaults.
@@ -59,8 +60,14 @@
         )
       );
       ultimateController = pkgs.writeText "retro-ultimate2-controller.cfg" (
-        renderSettings retroarchSettings
+        renderSettings (
+          retroarchSettings
+          // {
+            input_player1_reserved_device = "2dc8:6012 8Bitdo Ultimate 2 Wireless Controller";
+          }
+        )
       );
+      pro3Controller = pkgs.writeText "retro-pro3-controller.cfg" (renderSettings retroarchSettings);
       shaders = "${pkgs.libretro-shaders-slang}/share/libretro/shaders/shaders_slang";
       crtPreset = pkgs.writeText "retro-crt.slangp" ''
         #reference "${shaders}/bezel/Mega_Bezel/Presets/MBZ__3__STD.slangp"
@@ -137,7 +144,7 @@
           EOF
             ) || true
           fi
-          profile_config=${ultimateController}
+          profile_config=${pro3Controller}
           presentation_config=
           achievements_mode=
           shader_args=()
@@ -154,7 +161,8 @@
                 case "''${2:-}" in
                   n64) profile_config=${n64Controller} ;;
                   ultimate2) profile_config=${ultimateController} ;;
-                  *) echo 'retro-play: expected --profile n64 or ultimate2' >&2; exit 2 ;;
+                  pro3) profile_config=${pro3Controller} ;;
+                  *) echo 'retro-play: expected --profile n64, ultimate2 or pro3' >&2; exit 2 ;;
                 esac
                 shift 2
                 ;;

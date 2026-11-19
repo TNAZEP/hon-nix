@@ -240,27 +240,52 @@ The current verified device modes are:
 | --- | --- | --- |
 | 8BitDo 64, Bluetooth | `2dc8:3019` | A/B, all four C buttons, L/R/Z, Select/Start/Home, full stick range and D-pad verified; no SDL-advertised rumble in this mode |
 | Ultimate 2 Wireless, dongle D-input | `2dc8:6012` | Face/shoulder/system/stick buttons, four extra inputs, both sticks, analog triggers and D-pad verified; both rumble motors confirmed by the user |
+| Pro 3, 2.4 GHz receiver | `2dc8:310b` | Face/shoulder/system/stick buttons, D-pad, full stick and analog trigger travel verified; user felt both rumble pulses; extra-button and motion limits described below |
 | Original GameCube controller, official USB adapter | `057e:0337` | Native USB access, port 1, face/system buttons, D-pad, both sticks, separate analog trigger travel/digital L/R clicks, and sustained rumble verified; gameplay checks pending |
 
-RetroArch normally requests the Ultimate for player one; N64 launches request
-the 64 instead. Both use RetroArch's native VID/PID preference, rather than a
-joystick enumeration index. The 64's C buttons also
+RetroArch normally requests the shared `310b` receiver device for player one.
+The Pro 3 and the Ultimate 2 can both identify that way; using either in the same
+slot is intentional, with only one connected at a time. Dreamcast's Ultimate
+profile retains the previously verified `6012` mode preference and can fall back
+to the available `310b` pad. N64 requests the 64. These are preferred, nonexclusive
+native VID/PID reservations, rather than joystick enumeration indices. The 64's C buttons also
 emit right-stick directions. Its custom profile uses the raw udev layout.
-The Ultimate profile uses RetroArch's standardized SDL GameController layout;
-raw SDL joystick and evdev button numbers must not be substituted for it.
+The Ultimate and Pro 3 profiles use RetroArch's standardized SDL GameController
+layout; raw SDL joystick and evdev button numbers must not be substituted for it.
 SDL advertises Ultimate motion sensors, but sensor behaviour is not yet tested.
 Isolated RetroArch sessions confirmed that both custom profiles load and that
 the N64 launch reassigns the 64 to player one even when it is enumerated later.
-These sessions loaded no game and do not establish gameplay compatibility.
+New isolated sessions also confirmed the shared `310b` autoconfig loads in
+default, Pro 3 and Ultimate launch profiles, with base configs preserved. These
+sessions loaded no game and do not establish gameplay or audio compatibility.
 
-The Ultimate profile can be selected explicitly for a manual RetroArch launch:
+The Pro 3 receiver reports the misleading joystick name **8BitDo Ultimate 2
+Wireless Controller**. Its identity was confirmed by switching only the Pro 3
+off/on: receiver `310b` changes to idle `3109`, then returns to `310b`; the
+Ultimate 2 receiver remains separate. With both pads powered on, the Ultimate 2
+also reported `2dc8:310b` and the same
+SDL name. The installed `310b` autoconfig is therefore deliberately shared, and
+its display label names both controllers. The firmware-version portion of their
+SDL GUIDs differs, but no version- or port-based disambiguation is configured.
+Manual `--profile pro3` selects this shared preference, not a unique physical pad.
+This does not configure other Pro 3 transports/modes. SDL advertises no
+accelerometer or gyro in this receiver mode. Star and extra buttons produced no joystick events;
+controller keyboard/mouse interfaces were not captured, and extras stay unassigned.
+The accepted tests were repeated after charging, with no detach detected during
+those captures; earlier disconnecting captures were discarded as provisional.
+
+Profiles can be selected explicitly for a manual RetroArch launch:
 
 ```sh
+retro-play --profile pro3 [RetroArch arguments]
 retro-play --profile ultimate2 [RetroArch arguments]
+retro-play --profile n64 [RetroArch arguments]
 ```
 
-Both profiles configure a Select/Back modifier: Start exits, Home opens the menu,
-L/LB saves state, R/RB loads state, A pauses, and holding B fast-forwards. These
+All three profiles configure a Select/Back modifier: Start exits, Home opens
+the menu, L/LB saves state and R/RB loads state. On SDL pads the bottom face button
+pauses and holding the right face button fast-forwards; on the 64 these are A
+and B respectively. These
 action bindings still need in-game acceptance tests. Extra Ultimate buttons are
 detected but left unassigned. Core compatibility and hardcore-mode restrictions
 still apply to state operations. Missing-controller, reconnect and multiplayer
@@ -279,7 +304,7 @@ For manual launches, `--adapter native` forces native ports even if the adapter
 will be plugged in later, and `--adapter configured` preserves the saved choices.
 These overrides use Dolphin's command-line layer; they do not rewrite port
 settings in Dolphin.ini. Emulator-level hotplug, multiplayer and gameplay still
-need acceptance tests. The Pro 3 mapping awaits its physical test.
+need acceptance tests. Pro 3 gameplay and native-emulator assignments remain pending.
 Both adapter USB plugs are needed for rumble: the grey plug supplies motor power.
 With it connected, the user confirmed normal sustained rumble during a five-second
 native USB test. Short-pulse tests had been inconclusive.

@@ -49,6 +49,7 @@ pkgs.runCommand "hon-retro-library-checks"
     retro-play --version
     retro-play --profile n64 --version
     retro-play --profile ultimate2 --version
+    retro-play --profile pro3 --version
     retro-play --profile n64 --presentation crt --version
     retro-play --presentation gba-lcd --profile ultimate2 --version
     retro-play --presentation lcd --version
