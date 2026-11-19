@@ -1,4 +1,4 @@
-<!-- Additional classic routes; handheld LCD tuning remains pending. -->
+<!-- Additional classic routes; display and gameplay acceptance remain pending. -->
 <system>
   <name>nes</name><fullname>Nintendo Entertainment System</fullname>
   <path>%ROMPATH%/nes</path>
@@ -19,6 +19,7 @@
   <name>gb</name><fullname>Nintendo Game Boy</fullname>
   <path>%ROMPATH%/gb</path>
   <extension>.gb .GB .zip .ZIP .7z .7Z</extension>
+  <command label="SameBoy (LCD)">%EMULATOR_RETROARCH% --presentation lcd -L %CORE_RETROARCH%/sameboy_libretro.so %ROM%</command>
   <command label="SameBoy (Unfiltered)">%EMULATOR_RETROARCH% --presentation raw -L %CORE_RETROARCH%/sameboy_libretro.so %ROM%</command>
   <platform>gb</platform><theme>gb</theme>
 </system>
@@ -26,6 +27,7 @@
   <name>gbc</name><fullname>Nintendo Game Boy Color</fullname>
   <path>%ROMPATH%/gbc</path>
   <extension>.gb .GB .gbc .GBC .zip .ZIP .7z .7Z</extension>
+  <command label="SameBoy (LCD)">%EMULATOR_RETROARCH% --presentation lcd -L %CORE_RETROARCH%/sameboy_libretro.so %ROM%</command>
   <command label="SameBoy (Unfiltered)">%EMULATOR_RETROARCH% --presentation raw -L %CORE_RETROARCH%/sameboy_libretro.so %ROM%</command>
   <platform>gbc</platform><theme>gbc</theme>
 </system>
@@ -49,6 +51,7 @@
   <name>gamegear</name><fullname>Sega Game Gear</fullname>
   <path>%ROMPATH%/gamegear</path>
   <extension>.gg .GG .zip .ZIP .7z .7Z</extension>
+  <command label="Genesis Plus GX (LCD)">%EMULATOR_RETROARCH% --presentation lcd -L %CORE_RETROARCH%/genesis_plus_gx_libretro.so %ROM%</command>
   <command label="Genesis Plus GX (Unfiltered)">%EMULATOR_RETROARCH% --presentation raw -L %CORE_RETROARCH%/genesis_plus_gx_libretro.so %ROM%</command>
   <platform>gamegear</platform><theme>gamegear</theme>
 </system>
@@ -67,4 +70,134 @@
   <command label="PicoDrive (CRT)">%EMULATOR_RETROARCH% --presentation crt -L %CORE_RETROARCH%/picodrive_libretro.so %ROM%</command>
   <command label="PicoDrive (Unfiltered)">%EMULATOR_RETROARCH% --presentation raw -L %CORE_RETROARCH%/picodrive_libretro.so %ROM%</command>
   <platform>sega32x</platform><theme>sega32x</theme>
+</system>
+<system>
+  <name>psx</name><fullname>Sony PlayStation</fullname>
+  <path>%ROMPATH%/psx</path>
+  <extension>.cue .CUE .toc .TOC .m3u .M3U .ccd .CCD .exe .EXE .pbp .PBP .chd .CHD</extension>
+  <command label="Beetle PSX HW (CRT)">%EMULATOR_RETROARCH% --presentation crt -L %CORE_RETROARCH%/mednafen_psx_hw_libretro.so %ROM%</command>
+  <command label="Beetle PSX HW (Unfiltered)">%EMULATOR_RETROARCH% --presentation raw -L %CORE_RETROARCH%/mednafen_psx_hw_libretro.so %ROM%</command>
+  <platform>psx</platform><theme>psx</theme>
+</system>
+<system>
+  <name>saturn</name><fullname>Sega Saturn</fullname>
+  <path>%ROMPATH%/saturn</path>
+  <extension>.ccd .CCD .chd .CHD .cue .CUE .toc .TOC .m3u .M3U</extension>
+  <command label="Beetle Saturn (CRT)">%EMULATOR_RETROARCH% --presentation crt -L %CORE_RETROARCH%/mednafen_saturn_libretro.so %ROM%</command>
+  <command label="Beetle Saturn (Unfiltered)">%EMULATOR_RETROARCH% --presentation raw -L %CORE_RETROARCH%/mednafen_saturn_libretro.so %ROM%</command>
+  <platform>saturn</platform><theme>saturn</theme>
+</system>
+<system>
+  <name>dreamcast</name><fullname>Sega Dreamcast</fullname>
+  <path>%ROMPATH%/dreamcast</path>
+  <extension>.cdi .CDI .gdi .GDI .chd .CHD .cue .CUE .m3u .M3U</extension>
+  <command label="Flycast (CRT)">%EMULATOR_RETROARCH% --presentation crt -L %CORE_RETROARCH%/flycast_libretro.so %ROM%</command>
+  <command label="Flycast (Unfiltered)">%EMULATOR_RETROARCH% --presentation raw -L %CORE_RETROARCH%/flycast_libretro.so %ROM%</command>
+  <platform>dreamcast</platform><theme>dreamcast</theme>
+</system>
+<system>
+  <name>pcengine</name><fullname>NEC PC Engine</fullname>
+  <path>%ROMPATH%/pcengine</path>
+  <extension>.pce .PCE .zip .ZIP .7z .7Z</extension>
+  <command label="Beetle PCE (CRT)">%EMULATOR_RETROARCH% --presentation crt -L %CORE_RETROARCH%/mednafen_pce_libretro.so %ROM%</command>
+  <command label="Beetle PCE (Unfiltered)">%EMULATOR_RETROARCH% --presentation raw -L %CORE_RETROARCH%/mednafen_pce_libretro.so %ROM%</command>
+  <platform>pcengine</platform><theme>pcengine</theme>
+</system>
+<system>
+  <name>pcenginecd</name><fullname>NEC PC Engine CD</fullname>
+  <path>%ROMPATH%/pcenginecd</path>
+  <extension>.cue .CUE .ccd .CCD .chd .CHD .toc .TOC .m3u .M3U</extension>
+  <command label="Beetle PCE (CRT)">%EMULATOR_RETROARCH% --presentation crt -L %CORE_RETROARCH%/mednafen_pce_libretro.so %ROM%</command>
+  <command label="Beetle PCE (Unfiltered)">%EMULATOR_RETROARCH% --presentation raw -L %CORE_RETROARCH%/mednafen_pce_libretro.so %ROM%</command>
+  <platform>pcenginecd</platform><theme>pcenginecd</theme>
+</system>
+<system>
+  <name>supergrafx</name><fullname>NEC SuperGrafx</fullname>
+  <path>%ROMPATH%/supergrafx</path>
+  <extension>.pce .PCE .sgx .SGX .zip .ZIP .7z .7Z</extension>
+  <command label="Beetle PCE (CRT)">%EMULATOR_RETROARCH% --presentation crt -L %CORE_RETROARCH%/mednafen_pce_libretro.so %ROM%</command>
+  <command label="Beetle PCE (Unfiltered)">%EMULATOR_RETROARCH% --presentation raw -L %CORE_RETROARCH%/mednafen_pce_libretro.so %ROM%</command>
+  <platform>supergrafx</platform><theme>supergrafx</theme>
+</system>
+<system>
+  <name>neogeo</name><fullname>SNK Neo Geo</fullname>
+  <path>%ROMPATH%/neogeo</path>
+  <extension>.zip .ZIP .7z .7Z</extension>
+  <command label="FinalBurn Neo (CRT)">%EMULATOR_RETROARCH% --presentation crt -L %CORE_RETROARCH%/fbneo_libretro.so %ROM%</command>
+  <command label="FinalBurn Neo (Unfiltered)">%EMULATOR_RETROARCH% --presentation raw -L %CORE_RETROARCH%/fbneo_libretro.so %ROM%</command>
+  <platform>neogeo</platform><theme>neogeo</theme>
+</system>
+<system>
+  <name>neogeocd</name><fullname>SNK Neo Geo CD</fullname>
+  <path>%ROMPATH%/neogeocd</path>
+  <extension>.cue .CUE .chd .CHD</extension>
+  <command label="NeoCD (CRT)">%EMULATOR_RETROARCH% --presentation crt -L %CORE_RETROARCH%/neocd_libretro.so %ROM%</command>
+  <command label="NeoCD (Unfiltered)">%EMULATOR_RETROARCH% --presentation raw -L %CORE_RETROARCH%/neocd_libretro.so %ROM%</command>
+  <platform>neogeocd</platform><theme>neogeocd</theme>
+</system>
+<system>
+  <name>arcade</name><fullname>Arcade</fullname>
+  <path>%ROMPATH%/arcade</path>
+  <extension>.zip .ZIP .7z .7Z</extension>
+  <command label="FinalBurn Neo (Unfiltered)">%EMULATOR_RETROARCH% --presentation raw -L %CORE_RETROARCH%/fbneo_libretro.so %ROM%</command>
+  <command label="FinalBurn Neo (CRT Horizontal)">%EMULATOR_RETROARCH% --presentation crt -L %CORE_RETROARCH%/fbneo_libretro.so %ROM%</command>
+  <command label="FinalBurn Neo (CRT Vertical CCW)">%EMULATOR_RETROARCH% --presentation crt-vertical -L %CORE_RETROARCH%/fbneo_libretro.so %ROM%</command>
+  <command label="FinalBurn Neo (CRT Vertical CW)">%EMULATOR_RETROARCH% --presentation crt-vertical-cw -L %CORE_RETROARCH%/fbneo_libretro.so %ROM%</command>
+  <platform>arcade</platform><theme>arcade</theme>
+</system>
+<system>
+  <name>atari2600</name><fullname>Atari 2600</fullname>
+  <path>%ROMPATH%/atari2600</path>
+  <extension>.a26 .A26 .bin .BIN .zip .ZIP .7z .7Z</extension>
+  <command label="Stella (CRT)">%EMULATOR_RETROARCH% --presentation crt -L %CORE_RETROARCH%/stella_libretro.so %ROM%</command>
+  <command label="Stella (Unfiltered)">%EMULATOR_RETROARCH% --presentation raw -L %CORE_RETROARCH%/stella_libretro.so %ROM%</command>
+  <platform>atari2600</platform><theme>atari2600</theme>
+</system>
+<system>
+  <name>atari7800</name><fullname>Atari 7800</fullname>
+  <path>%ROMPATH%/atari7800</path>
+  <extension>.a78 .A78 .bin .BIN .zip .ZIP .7z .7Z</extension>
+  <command label="ProSystem (CRT)">%EMULATOR_RETROARCH% --presentation crt -L %CORE_RETROARCH%/prosystem_libretro.so %ROM%</command>
+  <command label="ProSystem (Unfiltered)">%EMULATOR_RETROARCH% --presentation raw -L %CORE_RETROARCH%/prosystem_libretro.so %ROM%</command>
+  <platform>atari7800</platform><theme>atari7800</theme>
+</system>
+<system>
+  <name>atarilynx</name><fullname>Atari Lynx</fullname>
+  <path>%ROMPATH%/atarilynx</path>
+  <extension>.lnx .LNX .lyx .LYX .bll .BLL .o .O .zip .ZIP .7z .7Z</extension>
+  <command label="Beetle Lynx (LCD)">%EMULATOR_RETROARCH% --presentation lcd -L %CORE_RETROARCH%/mednafen_lynx_libretro.so %ROM%</command>
+  <command label="Beetle Lynx (Unfiltered)">%EMULATOR_RETROARCH% --presentation raw -L %CORE_RETROARCH%/mednafen_lynx_libretro.so %ROM%</command>
+  <platform>atarilynx</platform><theme>atarilynx</theme>
+</system>
+<system>
+  <name>ngp</name><fullname>SNK Neo Geo Pocket</fullname>
+  <path>%ROMPATH%/ngp</path>
+  <extension>.ngp .NGP .ngc .NGC .ngpc .NGPC .npc .NPC .zip .ZIP .7z .7Z</extension>
+  <command label="Beetle NGP (LCD)">%EMULATOR_RETROARCH% --presentation lcd -L %CORE_RETROARCH%/mednafen_ngp_libretro.so %ROM%</command>
+  <command label="Beetle NGP (Unfiltered)">%EMULATOR_RETROARCH% --presentation raw -L %CORE_RETROARCH%/mednafen_ngp_libretro.so %ROM%</command>
+  <platform>ngp</platform><theme>ngp</theme>
+</system>
+<system>
+  <name>ngpc</name><fullname>SNK Neo Geo Pocket Color</fullname>
+  <path>%ROMPATH%/ngpc</path>
+  <extension>.ngp .NGP .ngc .NGC .ngpc .NGPC .npc .NPC .zip .ZIP .7z .7Z</extension>
+  <command label="Beetle NGP (LCD)">%EMULATOR_RETROARCH% --presentation lcd -L %CORE_RETROARCH%/mednafen_ngp_libretro.so %ROM%</command>
+  <command label="Beetle NGP (Unfiltered)">%EMULATOR_RETROARCH% --presentation raw -L %CORE_RETROARCH%/mednafen_ngp_libretro.so %ROM%</command>
+  <platform>ngpc</platform><theme>ngpc</theme>
+</system>
+<system>
+  <name>wonderswan</name><fullname>Bandai WonderSwan</fullname>
+  <path>%ROMPATH%/wonderswan</path>
+  <extension>.ws .WS .zip .ZIP .7z .7Z</extension>
+  <command label="Beetle WonderSwan (LCD)">%EMULATOR_RETROARCH% --presentation lcd -L %CORE_RETROARCH%/mednafen_wswan_libretro.so %ROM%</command>
+  <command label="Beetle WonderSwan (Unfiltered)">%EMULATOR_RETROARCH% --presentation raw -L %CORE_RETROARCH%/mednafen_wswan_libretro.so %ROM%</command>
+  <platform>wonderswan</platform><theme>wonderswan</theme>
+</system>
+<system>
+  <name>wonderswancolor</name><fullname>Bandai WonderSwan Color</fullname>
+  <path>%ROMPATH%/wonderswancolor</path>
+  <extension>.ws .WS .wsc .WSC .pc2 .PC2 .pcv2 .PCV2 .zip .ZIP .7z .7Z</extension>
+  <command label="Beetle WonderSwan (LCD)">%EMULATOR_RETROARCH% --presentation lcd -L %CORE_RETROARCH%/mednafen_wswan_libretro.so %ROM%</command>
+  <command label="Beetle WonderSwan (Unfiltered)">%EMULATOR_RETROARCH% --presentation raw -L %CORE_RETROARCH%/mednafen_wswan_libretro.so %ROM%</command>
+  <platform>wonderswancolor</platform><theme>wonderswancolor</theme>
 </system>

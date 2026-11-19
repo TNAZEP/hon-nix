@@ -96,7 +96,13 @@ class LibraryTest(unittest.TestCase):
     def test_classic_platforms_preserve_disc_tracks_and_playlists(self):
         folders = {"nes": "Famicom", "snes": "Super Famicom", "gb": "Game Boy",
                    "gbc": "Game Boy Color", "mastersystem": "SMS", "megadrive": "Genesis",
-                   "gamegear": "Game Gear", "segacd": "Mega CD", "sega32x": "32X"}
+                   "gamegear": "Game Gear", "segacd": "Mega CD", "sega32x": "32X",
+                   "psx": "PS1", "saturn": "Saturn", "dreamcast": "DC",
+                   "pcengine": "PCE", "pcenginecd": "PC Engine CD", "supergrafx": "SGX",
+                   "neogeo": "Neo Geo", "neogeocd": "Neo Geo CD", "arcade": "FBNeo",
+                   "atari2600": "Atari 2600", "atari7800": "Atari 7800",
+                   "atarilynx": "Lynx", "ngp": "NGP", "ngpc": "NGPC",
+                   "wonderswan": "WS", "wonderswancolor": "WSC"}
         for folder in folders.values():
             (self.root / folder).mkdir()
         disc = self.root / "Mega CD/Disc Game"

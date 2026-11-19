@@ -28,6 +28,7 @@
       '';
       retroarchSettings = {
         config_save_on_exit = "false";
+        cheevos_enable = "false";
         cheevos_hardcore_mode_enable = "false";
         sort_savefiles_enable = "true";
         sort_savestates_enable = "true";
@@ -66,13 +67,27 @@
         HSM_INTRO_WHEN_TO_SHOW = "0"
         HSM_REFLECT_GLOBAL_AMOUNT = "20"
       '';
+      verticalPreset =
+        rotation:
+        pkgs.writeText "retro-crt-vertical-${rotation}.slangp" ''
+          #reference "${crtPreset}"
+          HSM_ROTATE_CORE_IMAGE = "${rotation}"
+          HSM_ASPECT_RATIO_MODE = "2"
+        '';
       crtPresentation = pkgs.writeText "retro-crt.cfg" (renderSettings {
         video_shader_enable = "true";
         video_scale_integer = "false";
         # Mega Bezel owns the inner content ratio, within a full viewport.
         aspect_ratio_index = "24";
       });
-      lcdPresentation = pkgs.writeText "retro-gba-lcd.cfg" (renderSettings {
+      verticalPresentation = pkgs.writeText "retro-crt-vertical.cfg" (renderSettings {
+        video_shader_enable = "true";
+        video_scale_integer = "false";
+        aspect_ratio_index = "24";
+        # The shader rotates the raw framebuffer; avoid a second frontend turn.
+        video_allow_rotate = "false";
+      });
+      lcdPresentation = pkgs.writeText "retro-lcd.cfg" (renderSettings {
         video_shader_enable = "true";
         video_scale_integer = "false";
         aspect_ratio_index = "22";
@@ -91,9 +106,22 @@
           exec ${lib.getExe pkgs.python3} ${./retro/library.py} "$@"
         '';
       };
+      audit = pkgs.writeShellApplication {
+        name = "retro-audit";
+        text = ''
+          exec ${lib.getExe pkgs.python3} ${./retro/audit.py} "$@"
+        '';
+      };
+      achievements = pkgs.writeShellApplication {
+        name = "retro-achievements";
+        text = ''
+          exec ${lib.getExe pkgs.python3} ${./retro/achievements.py} "$@"
+        '';
+      };
       play = pkgs.writeShellApplication {
         name = "retro-play";
         text = ''
+          umask 077
           config_dir="''${XDG_CONFIG_HOME:-$HOME/.config}/hon-retro"
           data_dir="''${XDG_DATA_HOME:-$HOME/.local/share}/hon-retro"
           mkdir -p "$config_dir" "$data_dir"/{bios,saves,states,shaders}
@@ -111,9 +139,17 @@
           fi
           profile_config=${ultimateController}
           presentation_config=
+          achievements_mode=
           shader_args=()
           while [[ $# -gt 0 ]]; do
             case "$1" in
+              --achievements)
+                case "''${2:-}" in
+                  off|softcore|hardcore) achievements_mode="$2" ;;
+                  *) echo 'retro-play: expected --achievements off, softcore or hardcore' >&2; exit 2 ;;
+                esac
+                shift 2
+                ;;
               --profile)
                 case "''${2:-}" in
                   n64) profile_config=${n64Controller} ;;
@@ -129,12 +165,24 @@
                     presentation_config=${crtPresentation}
                     shader_args=(--set-shader ${crtPreset})
                     ;;
+                  crt-vertical)
+                    presentation_config=${verticalPresentation}
+                    shader_args=(--set-shader ${verticalPreset "1"})
+                    ;;
+                  crt-vertical-cw)
+                    presentation_config=${verticalPresentation}
+                    shader_args=(--set-shader ${verticalPreset "-1"})
+                    ;;
                   gba-lcd)
                     presentation_config=${lcdPresentation}
                     shader_args=(--set-shader ${shaders}/presets/handheld-plus-color-mod/lcd-grid-v2-gba-color.slangp)
                     ;;
+                  lcd)
+                    presentation_config=${lcdPresentation}
+                    shader_args=(--set-shader ${shaders}/handheld/lcd-grid-v2.slangp)
+                    ;;
                   raw) presentation_config=${rawPresentation} ;;
-                  *) echo 'retro-play: expected --presentation crt, gba-lcd or raw' >&2; exit 2 ;;
+                  *) echo 'retro-play: expected --presentation crt, crt-vertical, crt-vertical-cw, gba-lcd, lcd or raw' >&2; exit 2 ;;
                 esac
                 shift 2
                 ;;
@@ -143,6 +191,21 @@
           done
           if [[ -n "$presentation_config" ]]; then
             profile_config+="|$presentation_config"
+          fi
+          if [[ -z "$achievements_mode" ]]; then
+            achievements_mode="$(${lib.getExe achievements} resolve-mode)"
+          fi
+          if [[ "$achievements_mode" != off ]]; then
+            for argument in "$@"; do
+              case "$argument" in
+                -v|--verbose|--log-file|--log-file=*)
+                  echo 'retro-play: disable achievements before diagnostic logging' >&2
+                  exit 2
+                  ;;
+              esac
+            done
+            auth_config="$(${lib.getExe achievements} fragment "$achievements_mode")"
+            profile_config+="|$auth_config"
           fi
           exec ${lib.getExe retroarch} --config "$config_dir/retroarch.cfg" \
             --appendconfig "$profile_config" "''${shader_args[@]}" "$@"
@@ -247,6 +310,17 @@
             sameboy
             genesis-plus-gx
             picodrive
+            beetle-psx-hw
+            beetle-saturn
+            flycast
+            beetle-pce
+            fbneo
+            neocd
+            stella
+            prosystem
+            beetle-lynx
+            beetle-ngp
+            beetle-wswan
             mgba
             mupen64plus
           ];
@@ -270,6 +344,8 @@
             frontend
             retroarch
             library
+            audit
+            achievements
             play
             home
             console

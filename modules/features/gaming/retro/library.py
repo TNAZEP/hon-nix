@@ -12,6 +12,22 @@ import xml.etree.ElementTree as ET
 
 # Folder aliases, not private library paths. Explicit mappings take precedence.
 ALIASES = {
+    "psx": ["psx", "PSX", "PS1", "PlayStation"],
+    "saturn": ["saturn", "Saturn", "SATURN"],
+    "dreamcast": ["dreamcast", "Dreamcast", "DC"],
+    "pcengine": ["pcengine", "PC Engine", "PCE", "TurboGrafx-16"],
+    "pcenginecd": ["pcenginecd", "PC Engine CD", "PCECD", "TurboGrafx-CD"],
+    "supergrafx": ["supergrafx", "SuperGrafx", "SGX"],
+    "neogeo": ["neogeo", "Neo Geo", "NEOGEO"],
+    "neogeocd": ["neogeocd", "Neo Geo CD", "NEOGEOCD"],
+    "arcade": ["arcade", "Arcade", "FBNeo"],
+    "atari2600": ["atari2600", "Atari 2600", "A2600"],
+    "atari7800": ["atari7800", "Atari 7800", "A7800"],
+    "atarilynx": ["atarilynx", "Atari Lynx", "Lynx", "LYNX"],
+    "ngp": ["ngp", "NGP", "Neo Geo Pocket"],
+    "ngpc": ["ngpc", "NGPC", "Neo Geo Pocket Color"],
+    "wonderswan": ["wonderswan", "WonderSwan", "WS"],
+    "wonderswancolor": ["wonderswancolor", "WonderSwan Color", "WSC"],
     "nes": ["nes", "NES", "Famicom"],
     "snes": ["snes", "SNES", "SFC", "Super Famicom"],
     "gb": ["gb", "GB", "Game Boy"],

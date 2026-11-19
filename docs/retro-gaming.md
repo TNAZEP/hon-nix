@@ -2,7 +2,9 @@
 
 The environment provides native ES-DE with the pinned iiSU Interpreted theme,
 RetroArch cores for NES/FDS, SNES, GB/GBC, N64, GBA, Master System, Mega Drive,
-Game Gear, Sega CD and 32X, and standalone Dolphin for GameCube/Wii.
+Game Gear, Sega CD, 32X, PlayStation, Saturn, Dreamcast, PC Engine/CD/SuperGrafx,
+Neo Geo/CD, FBNeo arcade, Atari 2600/7800/Lynx, Neo Geo Pocket/Color and
+WonderSwan/Color, and standalone Dolphin for GameCube/Wii.
 Additional native launch routes cover PS2, Xbox, DS, PSP, PS3, Xbox 360, Wii U and
 3DS. Shipwright and 2Ship2Harkinian remain installed. Package builds and frontend
 routes are verified; game compatibility, remaining classic coverage, controller
@@ -20,18 +22,31 @@ emulators and their custom frontend routes, retaining Dolphin and the core set.
 | --- | --- | --- |
 | NES / FDS | Mesen | FDS needs `disksys.rom`; ordinary NES cartridges do not |
 | SNES | bsnes | Enhancement-chip titles may need matching coprocessor firmware; special cartridge/SGB setups are pending |
-| GB / GBC | SameBoy | External boot ROMs are optional; dedicated LCD presentation and link features remain pending |
+| GB / GBC | SameBoy | External boot ROMs are optional; LCD grid is available; link features remain pending |
 | Master System / Mega Drive / Game Gear | Genesis Plus GX | Ordinary cartridges generally need no external BIOS; three/six-button and game-specific remaps remain pending |
 | Sega CD | Genesis Plus GX | Supply the regional `bios_CD_U.bin`, `bios_CD_E.bin` or `bios_CD_J.bin` in the RetroArch BIOS directory |
 | Sega 32X | PicoDrive | Separate core from Genesis Plus GX; controller and gameplay acceptance pending |
+| PlayStation | Beetle PSX HW | Supply matching regional `scph5500.bin`, `scph5501.bin` or `scph5502.bin`; PAL titles may need matching `.sbi` sidecars |
+| Saturn | Beetle Saturn | Supply `sega_101.bin` for Japan or `mpr-17933.bin` for US/Europe; special cartridges need per-game setup |
+| Dreamcast | Flycast | Optional `dc/dc_boot.bin`; writable VMU/NVRAM lives beneath the BIOS directory; Naomi/Atomiswave are not configured |
+| PC Engine / CD / SuperGrafx | Beetle PCE | Cartridges need no firmware; CD normally needs `syscard3.pce`, with other system cards for specific titles |
+| Neo Geo / Arcade | FinalBurn Neo | Matching ROM sets, parent sets and board BIOS as needed; Neo Geo needs `fbneo/neogeo.zip` |
+| Neo Geo CD | NeoCD | A supported original CD BIOS beneath `neocd/` is recommended; built-in high-level fallback and save-state compatibility remain untested |
+| Atari 2600 / 7800 | Stella / ProSystem | No 2600 BIOS; `7800 BIOS (U).rom` is optional for ProSystem |
+| Atari Lynx | Beetle Lynx | Supply `lynxboot.img`; portrait controls and layouts need per-game testing |
+| Neo Geo Pocket / Color | Beetle NGP | No external firmware required; controller acceptance pending |
+| WonderSwan / Color | Beetle WonderSwan | No external firmware required; portrait controls and layouts need per-game testing |
 | N64 | Mupen64Plus-Next | Ordinary cartridges need no firmware; 64DD is not configured |
 | GBA | mGBA | BIOS optional for normal play; special features remain untested |
 
 Sega CD discovery accepts `.cue`, `.chd` and `.m3u` files, including uppercase
 extensions. Keep cue sheets beside their referenced tracks and preserve relative
-paths in playlists. Track `.bin` files and disc archives are intentionally absent
-from this system's game list. No automatic playlist generation or conversion is
-performed. NES/SNES and cartridge routes accept ZIP/7z; disc images should remain
+paths in playlists. PlayStation, Saturn, Dreamcast, PC Engine CD and Neo Geo CD
+also omit individual track `.bin` files and disc archives from their game lists.
+Dreamcast accepts `.gdi`/`.cdi` as well as `.cue`/`.chd`/`.m3u`; PlayStation also
+accepts `.pbp`/`.ccd`/`.toc`/`.exe`. Neo Geo CD accepts `.cue`/`.chd`. Keep required
+sidecar files next to their descriptors. No automatic playlist generation or
+conversion is performed. NES/SNES and cartridge routes accept ZIP/7z; disc images should remain
 in their supported disc formats.
 
 Firmware requirements follow the pinned core-info files. See the upstream
@@ -41,8 +56,20 @@ Firmware requirements follow the pinned core-info files. See the upstream
 and [PicoDrive guide](https://docs.libretro.com/library/picodrive/) for core options
 and system-specific limits. No firmware is supplied. These are configured launch
 routes, with title-specific gameplay, audio and save acceptance still pending.
-PlayStation, Saturn, Dreamcast, PC Engine, Neo Geo, Atari and other early-system
-routes remain future work.
+See also the upstream [PlayStation](https://docs.libretro.com/library/beetle_psx_hw/),
+[Saturn](https://docs.libretro.com/library/beetle_saturn/),
+[Flycast](https://docs.libretro.com/library/flycast/),
+[Beetle PCE](https://docs.libretro.com/library/mednafen_pce/),
+[NeoCD](https://github.com/libretro/neocd_libretro/blob/b1e04c738cb48a1dae0574b8877f6a116d270ca1/README.md#bios-files) and
+[FBNeo](https://docs.libretro.com/library/fbneo/) documentation. Current upstream
+instructions may describe features newer than these locked cores; the configured
+PlayStation path expects user-supplied firmware. FBNeo ROM sets must match the
+pinned core revision, rather than an arbitrary MAME version. MAME-specific titles,
+Atari 5200, keypad-oriented early systems and lower-confidence 3DO/Jaguar/PC-FX/CD-i
+routes remain pending. Arcade defaults to unfiltered output. Its alternatives
+include horizontal CRT and two vertical CRT directions; select the appropriate
+alternative per game rather than applying a single orientation to the library.
+Real-game orientation acceptance remains pending.
 
 ## Native emulator setup
 
@@ -90,7 +117,10 @@ Initial aliases include `FDS`/`fds`, `N64`/`n64`, `GBA`/`gba`, and
 Xbox 360, Wii U and 3DS/N3DS. Classic aliases include NES/Famicom,
 SNES/SFC/Super Famicom, GB/Game Boy, GBC/Game Boy Color, SMS/Master System,
 MD/Mega Drive/Genesis, GG/Game Gear, SEGACD/Sega CD/Mega CD and 32X/Sega 32X.
-Canonical lowercase directory names also work; `retro-library map --help` lists
+Additional aliases cover PSX/PS1/PlayStation, Saturn, DC/Dreamcast,
+PCE/PC Engine/TurboGrafx-16, PCECD/PC Engine CD/TurboGrafx-CD, SGX/SuperGrafx,
+NEOGEO/Neo Geo, NEOGEOCD/Neo Geo CD, Arcade/FBNeo, Atari 2600/7800, Lynx,
+NGP/NGPC and WS/WSC. Canonical lowercase directory names also work; `retro-library map --help` lists
 canonical system names. Multiple matching folders require an explicit mapping.
 To use a different location or resolve ambiguous names:
 
@@ -153,11 +183,15 @@ playing a game for which prior progress matters.
 
 ## Presentation
 
-NES/FDS, SNES, N64, Master System, Mega Drive, Sega CD and 32X offer Mega
-Bezel's standard Guest-based CRT presentation by default, with an **Unfiltered**
+Home-console RetroArch routes, including NES/FDS, SNES, N64, Master System,
+Mega Drive, Sega CD, 32X, PlayStation, Saturn, Dreamcast, PC Engine, Neo Geo and
+Atari 2600/7800, offer Mega Bezel's standard Guest-based CRT presentation by
+default, with an **Unfiltered**
 alternative in ES-DE's emulator selection. GBA offers an LCD grid with GBA colour
-correction and an unfiltered alternative. GB, GBC and Game Gear currently use
-unfiltered, core-ratio output; dedicated LCD presets remain pending. GameCube
+correction and an unfiltered alternative. GB/GBC, Game Gear, Lynx, Neo Geo
+Pocket/Color and WonderSwan/Color now offer a generic LCD grid and an unfiltered alternative.
+This grid uses the core's ratio without GBA-specific colour correction; authentic
+DMG/panel calibration and portrait-layout acceptance remain pending. GameCube
 continues to use Dolphin's native rendering; a comparable standalone CRT pipeline
 is still pending.
 
@@ -166,6 +200,9 @@ Manual launches can select the same presentation:
 ```sh
 retro-play --profile n64 --presentation crt [RetroArch arguments]
 retro-play --presentation gba-lcd [RetroArch arguments]
+retro-play --presentation lcd [RetroArch arguments]
+retro-play --presentation crt-vertical [RetroArch arguments]
+retro-play --presentation crt-vertical-cw [RetroArch arguments]
 retro-play --presentation raw [RetroArch arguments]
 ```
 
@@ -175,6 +212,16 @@ and lets Mega Bezel maintain the inner image ratio; LCD and unfiltered choices
 use the core's ratio. Do not copy the CRT viewport setting to other pipelines.
 The CRT intro is disabled and reflections are reduced. These are starting
 presets, with PVM tuning, real-game performance and actual-display review pending.
+
+For FBNeo vertical games, **CRT Vertical CCW** (`crt-vertical`) follows the
+pinned Mega Bezel FBNeo variation: it rotates the raw framebuffer counterclockwise
+and uses a vertical 3:4 CRT tube. **CRT Vertical CW** (`crt-vertical-cw`) reverses
+that turn. Both disable RetroArch's own rotation to avoid a second rotation;
+the shader owns that operation. Keep FBNeo's Vertical Mode at its default
+**disabled** when evaluating these choices. This is for a normal landscape
+monitor, not a physically rotated display. Test title orientation, controls and
+aspect before saving a per-game emulator choice in ES-DE. Synthetic patterns
+verify both shader directions; no actual arcade title has been used yet.
 
 Shader assets are pinned under `~/.local/share/hon-retro/shaders/pinned`.
 Save experiments beside that link, rather than inside the immutable asset tree.
@@ -237,6 +284,127 @@ Both adapter USB plugs are needed for rumble: the grey plug supplies motor power
 With it connected, the user confirmed normal sustained rumble during a five-second
 native USB test. Short-pulse tests had been inconclusive.
 
+## RetroAchievements
+
+Achievements are off by default. `retro-achievements` can import a login token
+saved by RetroArch into private runtime files. It does not implement a separate
+login service, store your password or put credentials in Nix. Authentication and
+actual achievement unlocks still require user acceptance with supported games.
+
+First use RetroArch's own account UI. Before entering credentials, ensure the
+writable configuration is private:
+
+```sh
+retro-play --achievements off --version
+chmod 600 "${XDG_CONFIG_HOME:-$HOME/.config}/hon-retro/retroarch.cfg"
+retro-play --achievements off
+```
+
+In RetroArch, enable achievements for that setup session, sign in under
+**Settings → User → Accounts → RetroAchievements**, and use **Save Current
+Configuration** after RetroArch has obtained its login token. The managed default
+remains off on subsequent launches. Then import the private saved config:
+
+```sh
+retro-achievements import "${XDG_CONFIG_HOME:-$HOME/.config}/hon-retro/retroarch.cfg"
+retro-achievements mode softcore
+retro-achievements status
+```
+
+Import copies only `cheevos_username` and `cheevos_token`; the source config is
+preserved, including any password RetroArch itself saved there. If no token is
+present, complete login in RetroArch and save again. Native login/token refresh
+has not been tested with the user's account; re-import after refreshing a token.
+The helper rejects source files readable by other users, links and malformed
+credentials. Status never prints account names or tokens.
+
+The preference applies to `retro-play`, including frontend launches. Switch it
+off with `retro-achievements mode off`, or override it for one launch:
+
+```sh
+retro-play --achievements off [RetroArch arguments]
+retro-play --achievements softcore [RetroArch arguments]
+retro-play --achievements hardcore [RetroArch arguments]
+```
+
+Hardcore is available only as an explicit launch option; it cannot be saved as
+the helper's default. RetroArch enforces its hardcore restrictions on states,
+rewind and cheats; automatic state loading is additionally disabled for that
+launch. Do not regard the hotkey/state combination as physically accepted yet.
+Achievements use the normal service endpoint, with rich presence and verbose
+achievement diagnostics disabled. Explicit diagnostic logging is rejected while
+authenticated; use `--achievements off` for rendering/debug probes. All helper
+options must precede ordinary RetroArch arguments.
+
+Imported credentials and session fragments live under
+`~/.config/hon-retro/achievements/` (respecting XDG). The directory is mode 0700
+and its files are mode 0600. New RetroArch base configs are private too; an
+authenticated launch tightens an existing owned base config to 0600 without
+changing its contents. Automatic config saving stays disabled. Explicitly saving
+a configuration can merge credentials into the base file, so keep that file
+private. Softcore/hardcore session fragments are separate to prevent simultaneous
+launches from changing each other's mode. Native standalone emulators retain
+their own account configuration and compatibility requirements.
+
+## Read-only library audits
+
+`retro-audit` inventories regular files recursively and uses SHA-256 to report
+byte-identical groups. It hashes only files sharing a size with another file.
+Filenames do not determine duplicate status, and the report makes no region or
+revision judgements. Hard-linked names include a `distinct_inodes` count so they
+are not mistaken for independent copies consuming extra disk space.
+
+```sh
+retro-audit "/path/to/ROMs" --output "/path/outside/library/duplicates.json"
+```
+
+The report must be a new file outside the source library. It is created with
+mode 0600; existing files or links are never replaced. Omit `--output` for JSON
+on stdout. Source symlinks and special files are skipped, including symlink loops
+and links escaping the root. Use a real source directory rather than the managed
+symlink view to inspect its contents. The command detects changes before/during
+hashing and returns an incomplete report with errors if files become unreadable
+or change; use a quiet library for a useful snapshot. Exit codes are 0 for a
+completed scan (including scans finding duplicates), 1 for scan/hash errors or
+DAT mismatches/incomplete verification, and
+2 for invalid input or report-write failure.
+
+The duplicate groups compare whole files. Different archive compression can hide
+identical internal ROMs, and identical files may be required in multiple sets.
+The tool never deletes, moves, renames, converts or repairs anything; do not treat
+a duplicate report as a safe deletion list.
+
+For optional content verification, supply your own UTF-8 Logiqx XML DAT and select
+a source directory appropriate to that DAT:
+
+```sh
+retro-audit "/path/to/one-system" --dat "/path/to/matching-core.dat" \
+  --zip-members --output "/path/outside/library/verification.json"
+```
+
+No DAT or game content is downloaded. The report records the DAT's name, version
+and SHA-256, plus matching, missing and unrecognized content. Matches require the
+declared byte size and every supplied checksum (CRC32, MD5, SHA-1, SHA-256),
+independent of filenames. A CRC-only DAT provides weaker evidence than a DAT
+containing stronger checksums. DAT dump-status and merge metadata are retained;
+a checksum match does not turn a known bad dump into a good dump. Undumped ROMs
+are listed separately; entries without checksums remain unverified.
+
+`--zip-members` streams ZIP members for matching without writing extracted files.
+Members with traversal-like names are treated as data, never filesystem paths.
+Archive symlinks are skipped, and corrupt/encrypted/unsupported archives or changed
+sources produce incomplete results. The default decompressed member limit is
+512 MiB; use `--max-member-bytes N` for a deliberate different limit. Oversized
+members are reported as skipped. Without `--zip-members`, archives are treated as
+whole files. 7z/RAR member verification is not implemented.
+
+Keep DAT files and reports outside the source directory. DATs are limited to
+64 MiB; internal DTD/entity declarations are rejected and external DTDs are never
+resolved. Verification does not establish parent-set, CHD or board completeness,
+nor prove compatibility with an emulator. Use a DAT from the exact chosen core
+revision where that matters. All audit tests use synthetic fixtures; no audit has
+been run on the user's games.
+
 ## Packaging and updates
 
 ES-DE is a local source package because the locked Nixpkgs removed its old
@@ -279,9 +447,10 @@ python tests/retro-render.py /path/to/retro-play /tmp/retro-render-check
 ```
 
 It requires a new output directory and records logs and screenshots for CRT,
-GBA LCD and unfiltered output. It checks shader compilation, successful exit and
-base-config preservation. These pipelines passed on the RX 9070 XT; that is not
-a game-performance benchmark or evidence of calibrated PVM reproduction.
+GBA LCD, generic LCD, both vertical CRT directions and unfiltered output. It checks shader compilation,
+successful exit and base-config preservation. The original four and both vertical CRT directions passed on the RX 9070 XT;
+these checks do not measure game performance or establish calibrated PVM
+reproduction.
 
 Physical acceptance must cover controller navigation, missing/reconnected
 controllers, native GameCube adapter trigger/rumble behaviour, DolphinBar IR and

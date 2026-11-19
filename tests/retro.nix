@@ -11,6 +11,9 @@ let
   play = pkgs.lib.findFirst (
     package: pkgs.lib.getName package == "retro-play"
   ) (throw "retro-play is missing") config.environment.systemPackages;
+  achievements = pkgs.lib.findFirst (
+    package: pkgs.lib.getName package == "retro-achievements"
+  ) (throw "retro-achievements is missing") config.environment.systemPackages;
 in
 assert home.xdg.dataFile ? "hon-retro/frontend/themes/iisu-interpreted-es-de";
 assert home.xdg.desktopEntries ? retro-home;
@@ -30,10 +33,14 @@ pkgs.runCommand "hon-retro-library-checks"
     nativeBuildInputs = [
       pkgs.python3
       play
+      achievements
     ];
   }
   ''
     python ${./retro.py} ${../modules/features/gaming/retro/library.py}
+    python ${./retro-audit.py} ${../modules/features/gaming/retro/audit.py}
+    python ${./retro-dat.py} ${../modules/features/gaming/retro/audit.py}
+    python ${./retro-achievements.py} ${../modules/features/gaming/retro/achievements.py}
     python ${./retro-frontends.py} \
       ${home.xdg.dataFile."hon-retro/frontend/custom_systems/es_systems.xml".source} \
       ${home.xdg.dataFile."hon-retro/frontend/custom_systems/es_find_rules.xml".source}
@@ -44,7 +51,27 @@ pkgs.runCommand "hon-retro-library-checks"
     retro-play --profile ultimate2 --version
     retro-play --profile n64 --presentation crt --version
     retro-play --presentation gba-lcd --profile ultimate2 --version
+    retro-play --presentation lcd --version
+    retro-play --presentation crt-vertical --version
+    retro-play --presentation crt-vertical-cw --version
     retro-play --presentation raw --version
+    retro-play --achievements off --version
+    retro-achievements status
+    printf '%s\n' 'cheevos_username = "fixture-user"' 'cheevos_token = "fixture-token"' > "$TMPDIR/private-login.cfg"
+    chmod 600 "$TMPDIR/private-login.cfg"
+    retro-achievements import "$TMPDIR/private-login.cfg"
+    retro-achievements mode softcore
+    retro-play --version > "$TMPDIR/auth-output" 2>&1
+    retro-play --achievements hardcore --version >> "$TMPDIR/auth-output" 2>&1
+    if retro-play --achievements softcore --verbose --version >> "$TMPDIR/auth-output" 2>&1; then
+      echo 'Expected authenticated diagnostics to be rejected' >&2
+      exit 1
+    fi
+    if grep -E 'fixture-user|fixture-token' "$TMPDIR/auth-output"; then
+      echo 'Unexpected credential in launcher output' >&2
+      exit 1
+    fi
+    retro-achievements mode off
     test -f "$XDG_CONFIG_HOME/hon-retro/retroarch.cfg"
     printf '%s\n' '# User experiment' > "$XDG_CONFIG_HOME/hon-retro/retroarch.cfg"
     retro-play --version

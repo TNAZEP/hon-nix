@@ -41,6 +41,9 @@ with tempfile.TemporaryDirectory(prefix="hon-retro-render-") as temporary:
     base = Path(temporary)
     for presentation, controller, width, height in (
         ("crt", "n64", 320, 240), ("gba-lcd", "ultimate2", 240, 160),
+        ("lcd", "ultimate2", 160, 144),
+        ("crt-vertical", "ultimate2", 320, 240),
+        ("crt-vertical-cw", "ultimate2", 320, 240),
         ("raw", "ultimate2", 320, 240),
     ):
         print(f"Rendering {presentation}", flush=True)
@@ -60,6 +63,7 @@ with tempfile.TemporaryDirectory(prefix="hon-retro-render-") as temporary:
         env = os.environ | {
             "HOME": str(home), "XDG_CONFIG_HOME": str(home / "config"),
             "XDG_DATA_HOME": str(home / "data"), "SDL_JOYSTICK_HIDAPI_GAMECUBE": "0",
+            "XDG_CACHE_HOME": str(home / "cache"), "XDG_STATE_HOME": str(home / "state"),
         }
         screenshot = output / f"{presentation}.png"
         log_path = output / f"{presentation}.log"
