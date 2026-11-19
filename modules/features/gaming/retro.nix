@@ -243,6 +243,10 @@
           type = lib.types.listOf lib.types.package;
           default = with pkgs.libretro; [
             mesen
+            bsnes
+            sameboy
+            genesis-plus-gx
+            picodrive
             mgba
             mupen64plus
           ];
@@ -325,6 +329,7 @@
                   <command label="Dolphin (Configured)">%EMULATOR_DOLPHIN% --adapter configured -b -e %ROM%</command>
                   <platform>wii</platform><theme>wii</theme>
                 </system>
+                ${builtins.readFile ./retro/es_classic_systems.xml}
                 ${lib.optionalString config.hon.retro.standalone.enable (
                   builtins.readFile ./retro/es_standalone_systems.xml
                 )}

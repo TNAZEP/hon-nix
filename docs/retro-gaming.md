@@ -1,10 +1,11 @@
 # Retro gaming
 
 The environment provides native ES-DE with the pinned iiSU Interpreted theme,
-RetroArch cores for FDS/NES, N64 and GBA, and standalone Dolphin for GameCube/Wii.
+RetroArch cores for NES/FDS, SNES, GB/GBC, N64, GBA, Master System, Mega Drive,
+Game Gear, Sega CD and 32X, and standalone Dolphin for GameCube/Wii.
 Additional native launch routes cover PS2, Xbox, DS, PSP, PS3, Xbox 360, Wii U and
 3DS. Shipwright and 2Ship2Harkinian remain installed. Package builds and frontend
-routes are verified; game compatibility, broader classic coverage, controller
+routes are verified; game compatibility, remaining classic coverage, controller
 acceptance and presentation tuning remain in progress.
 
 The `retro` capability owns its system packages and Home Manager configuration.
@@ -12,6 +13,36 @@ Midgar receives it through `gaming`. Hosts may set `hon.retro.enable = false`
 or override `hon.retro.cores` with a list of `pkgs.libretro` packages.
 Set `hon.retro.standalone.enable = false` to omit the eight additional standalone
 emulators and their custom frontend routes, retaining Dolphin and the core set.
+
+## Classic core setup
+
+| Platform | Core | Initial setup / current limit |
+| --- | --- | --- |
+| NES / FDS | Mesen | FDS needs `disksys.rom`; ordinary NES cartridges do not |
+| SNES | bsnes | Enhancement-chip titles may need matching coprocessor firmware; special cartridge/SGB setups are pending |
+| GB / GBC | SameBoy | External boot ROMs are optional; dedicated LCD presentation and link features remain pending |
+| Master System / Mega Drive / Game Gear | Genesis Plus GX | Ordinary cartridges generally need no external BIOS; three/six-button and game-specific remaps remain pending |
+| Sega CD | Genesis Plus GX | Supply the regional `bios_CD_U.bin`, `bios_CD_E.bin` or `bios_CD_J.bin` in the RetroArch BIOS directory |
+| Sega 32X | PicoDrive | Separate core from Genesis Plus GX; controller and gameplay acceptance pending |
+| N64 | Mupen64Plus-Next | Ordinary cartridges need no firmware; 64DD is not configured |
+| GBA | mGBA | BIOS optional for normal play; special features remain untested |
+
+Sega CD discovery accepts `.cue`, `.chd` and `.m3u` files, including uppercase
+extensions. Keep cue sheets beside their referenced tracks and preserve relative
+paths in playlists. Track `.bin` files and disc archives are intentionally absent
+from this system's game list. No automatic playlist generation or conversion is
+performed. NES/SNES and cartridge routes accept ZIP/7z; disc images should remain
+in their supported disc formats.
+
+Firmware requirements follow the pinned core-info files. See the upstream
+[Genesis Plus GX guide](https://docs.libretro.com/library/genesis_plus_gx/),
+[SameBoy guide](https://docs.libretro.com/library/sameboy/),
+[bsnes guide](https://github.com/libretro/docs/blob/master/docs/library/bsnes.md)
+and [PicoDrive guide](https://docs.libretro.com/library/picodrive/) for core options
+and system-specific limits. No firmware is supplied. These are configured launch
+routes, with title-specific gameplay, audio and save acceptance still pending.
+PlayStation, Saturn, Dreamcast, PC Engine, Neo Geo, Atari and other early-system
+routes remain future work.
 
 ## Native emulator setup
 
@@ -56,8 +87,12 @@ retro-home
 
 Initial aliases include `FDS`/`fds`, `N64`/`n64`, `GBA`/`gba`, and
 `GC`/`gc`/`GameCube`. Additional aliases cover Wii, PS2, Xbox, DS/NDS, PSP, PS3,
-Xbox 360, Wii U and 3DS/N3DS; `retro-library map --help` lists canonical system
-names. To use a different location or resolve ambiguous names:
+Xbox 360, Wii U and 3DS/N3DS. Classic aliases include NES/Famicom,
+SNES/SFC/Super Famicom, GB/Game Boy, GBC/Game Boy Color, SMS/Master System,
+MD/Mega Drive/Genesis, GG/Game Gear, SEGACD/Sega CD/Mega CD and 32X/Sega 32X.
+Canonical lowercase directory names also work; `retro-library map --help` lists
+canonical system names. Multiple matching folders require an explicit mapping.
+To use a different location or resolve ambiguous names:
 
 ```sh
 retro-library map gc "/path/to/GameCube games"
@@ -118,10 +153,13 @@ playing a game for which prior progress matters.
 
 ## Presentation
 
-FDS and N64 offer Mega Bezel's standard Guest-based CRT presentation by default;
-GBA offers an LCD grid with GBA colour correction. Each has an **Unfiltered**
-alternative in ES-DE's emulator selection. GameCube continues to use Dolphin's
-native rendering; a comparable standalone CRT pipeline is still pending.
+NES/FDS, SNES, N64, Master System, Mega Drive, Sega CD and 32X offer Mega
+Bezel's standard Guest-based CRT presentation by default, with an **Unfiltered**
+alternative in ES-DE's emulator selection. GBA offers an LCD grid with GBA colour
+correction and an unfiltered alternative. GB, GBC and Game Gear currently use
+unfiltered, core-ratio output; dedicated LCD presets remain pending. GameCube
+continues to use Dolphin's native rendering; a comparable standalone CRT pipeline
+is still pending.
 
 Manual launches can select the same presentation:
 
@@ -229,7 +267,9 @@ a synthetic game to an inert command. It does not run copyrighted content,
 validate an emulator, test physical controllers or measure GPU performance.
 PS3 view tests also cover ordinary dump-folder aliases, ISO preservation, name
 collisions, single-dump mappings, missing sources and upgrading the previous
-platform-root link without modifying frontend metadata.
+platform-root link without modifying frontend metadata. Classic tests preserve
+relative cue-sheet/track/playlist paths and require explicit selection when
+regional aliases such as Genesis and Mega Drive both exist.
 
 The optional manual rendering check opens short-lived Vulkan windows inside a
 Wayland desktop, uses generated test images, and keeps all settings temporary:

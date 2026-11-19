@@ -93,6 +93,36 @@ class LibraryTest(unittest.TestCase):
             self.assertEqual((self.view / system).resolve(), target)
         self.assertEqual(sorted(p.name for p in self.root.iterdir()), before)
 
+    def test_classic_platforms_preserve_disc_tracks_and_playlists(self):
+        folders = {"nes": "Famicom", "snes": "Super Famicom", "gb": "Game Boy",
+                   "gbc": "Game Boy Color", "mastersystem": "SMS", "megadrive": "Genesis",
+                   "gamegear": "Game Gear", "segacd": "Mega CD", "sega32x": "32X"}
+        for folder in folders.values():
+            (self.root / folder).mkdir()
+        disc = self.root / "Mega CD/Disc Game"
+        disc.mkdir()
+        originals = {disc / "Track 01.bin": b"inert track fixture",
+                     disc / "Disc One.cue": b'FILE "Track 01.bin" BINARY\n',
+                     disc / "Example.m3u": b"Disc One.cue\n"}
+        for path, content in originals.items():
+            path.write_bytes(content)
+        self.run_cli("set-root", self.root)
+        self.run_cli("refresh")
+        for system, folder in folders.items():
+            self.assertEqual((self.view / system).resolve(), self.root / folder)
+        for path, content in originals.items():
+            self.assertEqual(path.read_bytes(), content)
+            self.assertEqual((self.view / "segacd/Disc Game" / path.name).read_bytes(), content)
+
+    def test_regional_alias_ambiguity_preserves_view_until_mapped(self):
+        for name in ("Genesis", "Mega Drive"):
+            (self.root / name).mkdir()
+        self.run_cli("set-root", self.root, success=False)
+        self.assertFalse(self.view.exists())
+        self.run_cli("map", "megadrive", self.root / "Genesis")
+        self.run_cli("set-root", self.root)
+        self.assertEqual((self.view / "megadrive").resolve(), self.root / "Genesis")
+
     def ps3_dump(self, name="Example Game"):
         game = self.root / "PS3" / name
         (game / "PS3_GAME/USRDIR").mkdir(parents=True)

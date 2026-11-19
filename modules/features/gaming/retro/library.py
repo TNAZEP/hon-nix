@@ -12,6 +12,15 @@ import xml.etree.ElementTree as ET
 
 # Folder aliases, not private library paths. Explicit mappings take precedence.
 ALIASES = {
+    "nes": ["nes", "NES", "Famicom"],
+    "snes": ["snes", "SNES", "SFC", "Super Famicom"],
+    "gb": ["gb", "GB", "Game Boy"],
+    "gbc": ["gbc", "GBC", "Game Boy Color"],
+    "mastersystem": ["mastersystem", "Master System", "SMS"],
+    "megadrive": ["megadrive", "Mega Drive", "Genesis", "MD"],
+    "gamegear": ["gamegear", "Game Gear", "GG"],
+    "segacd": ["segacd", "Sega CD", "Mega CD", "SEGACD"],
+    "sega32x": ["sega32x", "Sega 32X", "32X"],
     "fds": ["fds", "FDS"],
     "n64": ["n64", "N64"],
     "gba": ["gba", "GBA"],

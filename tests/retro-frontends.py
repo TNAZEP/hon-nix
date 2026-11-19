@@ -17,6 +17,12 @@ cores = {
 }
 names = [system.findtext("name") for system in systems.findall("system")]
 assert len(names) == len(set(names)), "Duplicate custom frontend system"
+assert {"nes", "snes", "gb", "gbc", "mastersystem", "megadrive", "gamegear",
+        "segacd", "sega32x"} <= set(names), "Missing classic frontend routes"
+# Disc tracks must stay available to their cue sheets without becoming games.
+cd_extensions = systems.find("system[name='segacd']/extension").text.split()
+assert {".cue", ".chd", ".m3u", ".CUE", ".CHD", ".M3U"} <= set(cd_extensions)
+assert not {".bin", ".BIN", ".zip", ".ZIP", ".7z", ".7Z"} & set(cd_extensions)
 for system in systems.findall("system"):
     assert system.findtext("path").startswith("%ROMPATH%/"), "Runtime library path required"
     for command in system.findall("command"):

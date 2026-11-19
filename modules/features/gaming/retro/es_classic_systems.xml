@@ -1,0 +1,70 @@
+<!-- Additional classic routes; handheld LCD tuning remains pending. -->
+<system>
+  <name>nes</name><fullname>Nintendo Entertainment System</fullname>
+  <path>%ROMPATH%/nes</path>
+  <extension>.nes .NES .unf .UNF .unif .UNIF .zip .ZIP .7z .7Z</extension>
+  <command label="Mesen (CRT)">%EMULATOR_RETROARCH% --presentation crt -L %CORE_RETROARCH%/mesen_libretro.so %ROM%</command>
+  <command label="Mesen (Unfiltered)">%EMULATOR_RETROARCH% --presentation raw -L %CORE_RETROARCH%/mesen_libretro.so %ROM%</command>
+  <platform>nes</platform><theme>nes</theme>
+</system>
+<system>
+  <name>snes</name><fullname>Super Nintendo Entertainment System</fullname>
+  <path>%ROMPATH%/snes</path>
+  <extension>.smc .SMC .sfc .SFC .swc .SWC .fig .FIG .zip .ZIP .7z .7Z</extension>
+  <command label="bsnes (CRT)">%EMULATOR_RETROARCH% --presentation crt -L %CORE_RETROARCH%/bsnes_libretro.so %ROM%</command>
+  <command label="bsnes (Unfiltered)">%EMULATOR_RETROARCH% --presentation raw -L %CORE_RETROARCH%/bsnes_libretro.so %ROM%</command>
+  <platform>snes</platform><theme>snes</theme>
+</system>
+<system>
+  <name>gb</name><fullname>Nintendo Game Boy</fullname>
+  <path>%ROMPATH%/gb</path>
+  <extension>.gb .GB .zip .ZIP .7z .7Z</extension>
+  <command label="SameBoy (Unfiltered)">%EMULATOR_RETROARCH% --presentation raw -L %CORE_RETROARCH%/sameboy_libretro.so %ROM%</command>
+  <platform>gb</platform><theme>gb</theme>
+</system>
+<system>
+  <name>gbc</name><fullname>Nintendo Game Boy Color</fullname>
+  <path>%ROMPATH%/gbc</path>
+  <extension>.gb .GB .gbc .GBC .zip .ZIP .7z .7Z</extension>
+  <command label="SameBoy (Unfiltered)">%EMULATOR_RETROARCH% --presentation raw -L %CORE_RETROARCH%/sameboy_libretro.so %ROM%</command>
+  <platform>gbc</platform><theme>gbc</theme>
+</system>
+<system>
+  <name>mastersystem</name><fullname>Sega Master System</fullname>
+  <path>%ROMPATH%/mastersystem</path>
+  <extension>.sms .SMS .zip .ZIP .7z .7Z</extension>
+  <command label="Genesis Plus GX (CRT)">%EMULATOR_RETROARCH% --presentation crt -L %CORE_RETROARCH%/genesis_plus_gx_libretro.so %ROM%</command>
+  <command label="Genesis Plus GX (Unfiltered)">%EMULATOR_RETROARCH% --presentation raw -L %CORE_RETROARCH%/genesis_plus_gx_libretro.so %ROM%</command>
+  <platform>mastersystem</platform><theme>mastersystem</theme>
+</system>
+<system>
+  <name>megadrive</name><fullname>Sega Mega Drive</fullname>
+  <path>%ROMPATH%/megadrive</path>
+  <extension>.md .MD .gen .GEN .smd .SMD .bin .BIN .zip .ZIP .7z .7Z</extension>
+  <command label="Genesis Plus GX (CRT)">%EMULATOR_RETROARCH% --presentation crt -L %CORE_RETROARCH%/genesis_plus_gx_libretro.so %ROM%</command>
+  <command label="Genesis Plus GX (Unfiltered)">%EMULATOR_RETROARCH% --presentation raw -L %CORE_RETROARCH%/genesis_plus_gx_libretro.so %ROM%</command>
+  <platform>megadrive</platform><theme>megadrive</theme>
+</system>
+<system>
+  <name>gamegear</name><fullname>Sega Game Gear</fullname>
+  <path>%ROMPATH%/gamegear</path>
+  <extension>.gg .GG .zip .ZIP .7z .7Z</extension>
+  <command label="Genesis Plus GX (Unfiltered)">%EMULATOR_RETROARCH% --presentation raw -L %CORE_RETROARCH%/genesis_plus_gx_libretro.so %ROM%</command>
+  <platform>gamegear</platform><theme>gamegear</theme>
+</system>
+<system>
+  <name>segacd</name><fullname>Sega CD</fullname>
+  <path>%ROMPATH%/segacd</path>
+  <extension>.cue .CUE .chd .CHD .m3u .M3U</extension>
+  <command label="Genesis Plus GX (CRT)">%EMULATOR_RETROARCH% --presentation crt -L %CORE_RETROARCH%/genesis_plus_gx_libretro.so %ROM%</command>
+  <command label="Genesis Plus GX (Unfiltered)">%EMULATOR_RETROARCH% --presentation raw -L %CORE_RETROARCH%/genesis_plus_gx_libretro.so %ROM%</command>
+  <platform>segacd</platform><theme>segacd</theme>
+</system>
+<system>
+  <name>sega32x</name><fullname>Sega 32X</fullname>
+  <path>%ROMPATH%/sega32x</path>
+  <extension>.32x .32X .bin .BIN .md .MD .zip .ZIP .7z .7Z</extension>
+  <command label="PicoDrive (CRT)">%EMULATOR_RETROARCH% --presentation crt -L %CORE_RETROARCH%/picodrive_libretro.so %ROM%</command>
+  <command label="PicoDrive (Unfiltered)">%EMULATOR_RETROARCH% --presentation raw -L %CORE_RETROARCH%/picodrive_libretro.so %ROM%</command>
+  <platform>sega32x</platform><theme>sega32x</theme>
+</system>
