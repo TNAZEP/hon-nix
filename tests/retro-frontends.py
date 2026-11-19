@@ -23,6 +23,11 @@ assert {"nes", "snes", "gb", "gbc", "mastersystem", "megadrive", "gamegear",
         "pcenginecd", "supergrafx", "neogeo", "neogeocd", "arcade", "atari2600",
         "atari7800", "atarilynx", "ngp", "ngpc", "wonderswan", "wonderswancolor"
         } <= set(names), "Missing classic frontend routes"
+assert {"switch", "psvita", "ps4", "atari5200", "colecovision", "intellivision",
+        "odyssey2", "vectrex", "3do", "atarijaguar", "pcfx", "cdimono1", "mame",
+        "sg-1000", "virtualboy"} <= set(names), "Missing remaining platform routes"
+assert systems.find("system[name='psvita']/extension").text.split() == [".psvita", ".PSVITA"]
+assert ".pkg" not in systems.find("system[name='ps4']/extension").text.lower().split()
 # Disc tracks must stay available to their cue sheets without becoming games.
 cd_extensions = systems.find("system[name='segacd']/extension").text.split()
 assert {".cue", ".chd", ".m3u", ".CUE", ".CHD", ".M3U"} <= set(cd_extensions)

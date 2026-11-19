@@ -48,7 +48,10 @@
           flake = inputs.self;
           inherit pkgs;
         };
-        checks.retro-ui = import ./tests/retro-ui.nix { inherit pkgs; };
+        checks.retro-ui = import ./tests/retro-ui.nix {
+          flake = inputs.self;
+          inherit pkgs;
+        };
         checks.desktop = import ./tests/desktop.nix {
           flake = inputs.self;
           inherit pkgs;

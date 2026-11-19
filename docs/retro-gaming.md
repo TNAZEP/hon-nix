@@ -4,16 +4,20 @@ The environment provides native ES-DE with the pinned iiSU Interpreted theme,
 RetroArch cores for NES/FDS, SNES, GB/GBC, N64, GBA, Master System, Mega Drive,
 Game Gear, Sega CD, 32X, PlayStation, Saturn, Dreamcast, PC Engine/CD/SuperGrafx,
 Neo Geo/CD, FBNeo arcade, Atari 2600/7800/Lynx, Neo Geo Pocket/Color and
-WonderSwan/Color, and standalone Dolphin for GameCube/Wii.
-Additional native launch routes cover PS2, Xbox, DS, PSP, PS3, Xbox 360, Wii U and
-3DS. Shipwright and 2Ship2Harkinian remain installed. Package builds and frontend
-routes are verified; game compatibility, remaining classic coverage, controller
-acceptance and presentation tuning remain in progress.
+WonderSwan/Color, Atari 5200/Jaguar, ColecoVision, Intellivision, Odyssey2,
+Vectrex, 3DO, PC-FX, CD-i, SG-1000, Virtual Boy and MAME, and standalone Dolphin
+for GameCube/Wii.
+Additional native launch routes cover PS2, Xbox, DS, PSP, PS3, Xbox 360, Wii U,
+3DS, Switch, Vita and experimental PS4. Shipwright and 2Ship2Harkinian remain installed. Package builds and frontend
+routes are verified. Current acceptance focuses on library discovery, frontend
+launch/return, metadata/media persistence and platform integration. Actual
+gameplay verification is outside the current acceptance gate; configuration
+support does not imply compatibility or performance for every title.
 
 The `retro` capability owns its system packages and Home Manager configuration.
 Midgar receives it through `gaming`. Hosts may set `hon.retro.enable = false`
 or override `hon.retro.cores` with a list of `pkgs.libretro` packages.
-Set `hon.retro.standalone.enable = false` to omit the eight additional standalone
+Set `hon.retro.standalone.enable = false` to omit the eleven additional standalone
 emulators and their custom frontend routes, retaining Dolphin and the core set.
 
 ## Classic core setup
@@ -36,6 +40,18 @@ emulators and their custom frontend routes, retaining Dolphin and the core set.
 | Atari Lynx | Beetle Lynx | Supply `lynxboot.img`; portrait controls and layouts need per-game testing |
 | Neo Geo Pocket / Color | Beetle NGP | No external firmware required; controller acceptance pending |
 | WonderSwan / Color | Beetle WonderSwan | No external firmware required; portrait controls and layouts need per-game testing |
+| Atari 5200 | Atari800 | Supply `5200.rom`; review core machine selection and keypad controls |
+| ColecoVision | Gearcoleco | Supply `colecovision.rom`; keypad controls are core-specific |
+| Intellivision | FreeIntv | Supply `exec.bin` and `grom.bin`; keypad controls are core-specific |
+| Odyssey2 / Videopac | O2EM | Supply `o2rom.bin` or the appropriate regional/extended BIOS |
+| Vectrex | vecx | Raw vector output by default; overlays and vector presentation are separate choices |
+| 3DO | Opera | Supply a supported BIOS, such as `panafz1.bin`; cue/CHD/ISO discovery omits individual bin tracks |
+| Atari Jaguar | Virtual Jaguar | Cartridge formats only; Jaguar CD is not configured |
+| PC-FX | Beetle PC-FX | Supply `pcfx.rom`; cue/CCD/TOC/CHD discovery |
+| CD-i | SAME CDi | Supply matching BIOS sets beneath `same_cdi/bios/`; cue/CHD/ISO discovery |
+| MAME | Current libretro MAME | Dedicated `mame` directory for matching sets; ZIP/7z/CMD discovery, raw output by default |
+| SG-1000 | Genesis Plus GX | Cartridge `.sg` files and ZIP/7z |
+| Virtual Boy | Beetle VB | Raw output by default; stereo/palette options remain core settings |
 | N64 | Mupen64Plus-Next | Ordinary cartridges need no firmware; 64DD is not configured |
 | GBA | mGBA | BIOS optional for normal play; special features remain untested |
 
@@ -64,9 +80,9 @@ See also the upstream [PlayStation](https://docs.libretro.com/library/beetle_psx
 [FBNeo](https://docs.libretro.com/library/fbneo/) documentation. Current upstream
 instructions may describe features newer than these locked cores; the configured
 PlayStation path expects user-supplied firmware. FBNeo ROM sets must match the
-pinned core revision, rather than an arbitrary MAME version. MAME-specific titles,
-Atari 5200, keypad-oriented early systems and lower-confidence 3DO/Jaguar/PC-FX/CD-i
-routes remain pending. Arcade defaults to unfiltered output. Its alternatives
+pinned core revision, rather than an arbitrary MAME version. MAME has its own
+canonical library directory and core so its sets are kept separate from FBNeo.
+Keypad/vector systems retain their core-specific configuration requirements. Arcade defaults to unfiltered output. Its alternatives
 include horizontal CRT and two vertical CRT directions; select the appropriate
 alternative per game rather than applying a single orientation to the library.
 Real-game orientation acceptance remains pending.
@@ -84,17 +100,46 @@ Real-game orientation acceptance remains pending.
 | Xbox 360 | Native Xenia Canary | Experimental native Linux route; title-specific compatibility and save persistence need testing |
 | Wii U | Cemu | Supply dumped games and required keys; GamePad/motion profiles remain pending |
 | 3DS | Azahar | Use supported decrypted content; CIA installation stays in Azahar's own UI |
+| Switch | Eden | Supply your own required keys/firmware; native SDL launch route, with the Eden GUI available for setup |
+| PS Vita | Vita3K | Install firmware/content in Vita3K; frontend entries use `.psvita` installed-title markers |
+| PS4 | shadPS4 | Experimental unpacked-folder/ELF route; supply required dumped modules/content yourself |
 
 Open the native emulator directly to complete setup before launching firmware-
 dependent games from ES-DE. Firmware, keys and credentials are never supplied by
 Nix or downloaded automatically. The frontend routes do not complete these setup
-wizards. Switch, Vita and PS4 integration remains pending; Xbox One has no route.
+wizards. Xbox One has no configured emulator route. Platforms beyond the
+generation-eight scope, such as PS5 and Xbox Series, are not included.
 PS3 disc dumps receive `.ps3dir` aliases in a separate managed view; original
 folder names remain unchanged. Discovery recognizes complete disc layouts with
 `PS3_GAME/PARAM.SFO` and `PS3_GAME/USRDIR/EBOOT.BIN` at the platform root or one
 directory below it. ISO entries retain their names. Incomplete dumps and other
 directory layouts are not automatically indexed. Installed PSN titles still use
 RPCS3's own library; this does not install games, firmware or licenses.
+PS4 uses the same non-destructive directory-view approach: complete folders
+with `eboot.bin` and `sce_sys/param.sfo` receive `.ps4dir` aliases, while standalone
+ELF names are preserved. A platform mapping can point to one complete game folder
+or a parent directory containing games. PKG installation files are not presented
+as launchable games. Open shadPS4's own UI with `shadps4 -b` for setup.
+For manual artwork, ES-DE retains the directory suffix in media filenames:
+`Game.ps4dir` uses `downloaded_media/ps4/covers/Game.ps4dir.png` beneath the
+frontend data directory; PS3 directory aliases follow the same convention.
+Ordinary game files use their filename without the extension.
+
+For Vita, install the title in Vita3K first, then place a small text marker in
+your Vita library directory. For example, `Display Name.psvita` containing the
+installed title ID `PCSF00007` becomes a frontend entry. The display filename can
+be chosen freely; the helper reads and validates the ID from the file and passes
+it as one argument, with fullscreen enabled. Installation archives (`.vpk`, `.zip`,
+`.pkg`) are deliberately not launched from the frontend. See the
+[ES-DE Vita guide](https://gitlab.com/es-de/emulationstation-de/-/blob/master/USERGUIDE.md#sony-playstation-vita).
+The pinned Vita3K AppImage uses X11 through Xwayland; `retro-vita3k` selects its
+bundled xcb backend. For direct setup use `QT_QPA_PLATFORM=xcb vita3k`. Normal GUI
+startup was checked with an empty temporary home. This build's help invocation
+can abort on an empty configuration path; its launch flags were checked against
+the exact build source. No emulator update or firmware download is performed by
+these helpers. Switch uses Eden's native SDL executable (`eden-cli -f -g`), while
+`eden` remains available for initial setup and writable settings.
+
 Standalone CRT parity, RetroAchievements support and controller policy must be
 validated per emulator. The additional native emulators retain their own writable
 settings and save locations. `retro-xenia` explicitly uses
@@ -121,7 +166,10 @@ Additional aliases cover PSX/PS1/PlayStation, Saturn, DC/Dreamcast,
 PCE/PC Engine/TurboGrafx-16, PCECD/PC Engine CD/TurboGrafx-CD, SGX/SuperGrafx,
 NEOGEO/Neo Geo, NEOGEOCD/Neo Geo CD, Arcade/FBNeo, Atari 2600/7800, Lynx,
 NGP/NGPC and WS/WSC. Canonical lowercase directory names also work; `retro-library map --help` lists
-canonical system names. Multiple matching folders require an explicit mapping.
+canonical system names. Every canonical name also accepts an uppercase directory
+(e.g. `ATARI5200`, `COLECOVISION`, `PSVITA`). New aliases cover Switch, Vita, PS4,
+MAME, Atari 5200/Jaguar, ColecoVision, Intellivision, Videopac, Vectrex, 3DO,
+PC-FX, CD-i, SG-1000 and Virtual Boy. Multiple matching folders require an explicit mapping.
 To use a different location or resolve ambiguous names:
 
 ```sh
@@ -157,7 +205,7 @@ frontend survive rebuilds. The following paths use XDG defaults, respecting
 | --- | --- |
 | Library directory preferences | `~/.config/hon-retro/library.json` |
 | Library view | `~/.local/share/hon-retro/roms/` |
-| PS3 per-game aliases / ownership manifest | `~/.local/share/hon-retro/ps3/` and `ps3-view.json` |
+| PS3 / PS4 per-game aliases and ownership manifests | `~/.local/share/hon-retro/ps3/`, `ps4/`, `ps3-view.json`, `ps4-view.json` |
 | Frontend settings, metadata, artwork and logs | `~/.local/share/hon-retro/frontend/` |
 | RetroArch writable base configuration | `~/.config/hon-retro/retroarch.cfg` |
 | RetroArch saves / states | `~/.local/share/hon-retro/saves/` and `states/` |
@@ -455,9 +503,14 @@ nix build .#nixosConfigurations.midgar.config.system.build.toplevel --no-link
 
 The library tests cover path spacing, alias ambiguity, conflicting entries,
 unavailable roots, recursive mappings and preservation of settings/saves. The
-frontend test launches the real theme in isolated headless Wayland and routes
-a synthetic game to an inert command. It does not run copyrighted content,
-validate an emulator, test physical controllers or measure GPU performance.
+frontend check uses the generated system/discovery definitions and real theme
+in isolated headless Wayland. GBA, PS3, PS4, Switch, Vita, MAME, Atari 5200 and
+PC-FX fixtures route only to an inert command. Paths include spaces, including
+the fake emulator path. Checks preserve manual names, favorites, cover images
+and launch history across a forced frontend termination/restart. Screenshot
+checks require the supplied cover to render before and after restart, while verifying
+that source bytes and file lists are unchanged. No emulator game execution or
+GPU performance benchmark is involved.
 PS3 view tests also cover ordinary dump-folder aliases, ISO preservation, name
 collisions, single-dump mappings, missing sources and upgrading the previous
 platform-root link without modifying frontend metadata. Classic tests preserve
@@ -477,8 +530,8 @@ successful exit and base-config preservation. The original four and both vertica
 these checks do not measure game performance or establish calibrated PVM
 reproduction.
 
-Physical acceptance must cover controller navigation, missing/reconnected
-controllers, native GameCube adapter trigger/rumble behaviour, DolphinBar IR and
-motion, launching owned games, returning to the library, fullscreen transitions,
-and save persistence. Do not regard the environment as complete until those
-results and the remaining platform/presentation work are recorded.
+Further optional acceptance covers controller-only navigation/reconnect,
+DolphinBar IR/motion after purchase, presentation tuning and game/save behaviour.
+Those gameplay checks are separate from the current library/frontend completion
+gate. Xbox One, Jaguar CD and systems beyond generation eight are not claimed
+by these routes. Actual titles still depend on emulator compatibility and setup.

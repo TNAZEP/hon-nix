@@ -157,6 +157,59 @@ class LibraryTest(unittest.TestCase):
         self.run_cli("refresh", success=False)
         self.assertTrue(link.is_symlink())
 
+    def ps4_dump(self, name="PS4 Game With Spaces"):
+        game = self.root / "PS4" / name
+        (game / "sce_sys").mkdir(parents=True)
+        (game / "sce_sys/param.sfo").write_bytes(b"inert PS4 metadata")
+        (game / "eboot.bin").write_bytes(b"inert PS4 executable")
+        return game
+
+    def test_ps4_view_preserves_folders_elf_and_unavailable_links(self):
+        game = self.ps4_dump()
+        elf = game.parent / "Homebrew Demo.ELF"
+        elf.write_bytes(b"inert ELF fixture")
+        (game.parent / "Install.pkg").write_bytes(b"inert installation fixture")
+        self.run_cli("set-root", self.root)
+        self.assertEqual((self.view / "ps4/PS4 Game With Spaces.ps4dir").resolve(), game)
+        self.assertEqual((self.view / "ps4/Homebrew Demo.ELF").resolve(), elf)
+        self.assertFalse((self.view / "ps4/Install.pkg").exists())
+        self.assertEqual((game / "eboot.bin").read_bytes(), b"inert PS4 executable")
+        game.rename(game.with_name("Disconnected Game"))
+        self.run_cli("refresh")
+        self.assertTrue((self.view / "ps4/PS4 Game With Spaces.ps4dir").is_symlink())
+
+    def test_ps4_conflict_prevents_partial_ps3_and_platform_updates(self):
+        self.ps3_dump()
+        self.ps4_dump("Collision")
+        self.ps4_dump("Collision.ps4dir")
+        self.run_cli("set-root", self.root, success=False)
+        self.assertFalse(self.view.exists())
+        self.assertFalse((self.view.parent / "ps3").exists())
+        self.assertFalse((self.view.parent / "ps4").exists())
+
+    def test_remaining_aliases_and_vita_marker_are_preserved(self):
+        folders = {"switch": "Switch", "psvita": "PS Vita", "atari5200": "A5200",
+                   "colecovision": "Coleco", "intellivision": "INTV", "odyssey2": "Videopac",
+                   "vectrex": "Vectrex", "3do": "3DO", "atarijaguar": "Jaguar",
+                   "pcfx": "PC-FX", "cdimono1": "CD-i", "mame": "MAME",
+                   "sg-1000": "SG-1000", "virtualboy": "Virtual Boy"}
+        for folder in folders.values():
+            (self.root / folder).mkdir()
+        marker = self.root / "PS Vita/Display Name.psvita"
+        marker.write_text("PCSF00007\n")
+        self.run_cli("set-root", self.root)
+        for system, folder in folders.items():
+            self.assertEqual((self.view / system).resolve(), self.root / folder)
+        self.assertEqual((self.view / "psvita/Display Name.psvita").read_text(), "PCSF00007\n")
+        self.assertEqual(marker.read_text(), "PCSF00007\n")
+
+    def test_uppercase_canonical_folders_are_discovered_without_duplicates(self):
+        for name in ("ATARI5200", "COLECOVISION", "INTELLIVISION", "PSVITA"):
+            (self.root / name).mkdir()
+        self.run_cli("set-root", self.root)
+        for name in ("ATARI5200", "COLECOVISION", "INTELLIVISION", "PSVITA"):
+            self.assertEqual((self.view / name.lower()).resolve(), self.root / name)
+
     def test_existing_ps3_root_link_upgrades_without_changing_metadata(self):
         game = self.ps3_dump()
         self.view.mkdir(parents=True)

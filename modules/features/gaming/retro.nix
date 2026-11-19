@@ -18,6 +18,9 @@
         XENIA = pkgs.xenia-canary;
         CEMU = pkgs.cemu;
         AZAHAR = pkgs.azahar;
+        EDEN = pkgs.eden;
+        VITA3K = vita;
+        SHADPS4 = ps4;
       };
       controllerProfiles = pkgs.runCommand "retro-controller-profiles" { } ''
         mkdir -p "$out"
@@ -281,6 +284,20 @@
             "--storage_root=$data_dir" "--cache_root=$cache_dir" --discord=false "$@"
         '';
       };
+      vita = pkgs.writeShellApplication {
+        name = "retro-vita3k";
+        text = ''
+          # This pinned AppImage includes Qt's xcb plugin, not Wayland.
+          export QT_QPA_PLATFORM=xcb
+          exec ${lib.getExe pkgs.python3} ${./retro/native.py} vita ${lib.getExe pkgs.vita3k} "$@"
+        '';
+      };
+      ps4 = pkgs.writeShellApplication {
+        name = "retro-shadps4";
+        text = ''
+          exec ${lib.getExe pkgs.python3} ${./retro/native.py} ps4 ${lib.getExe pkgs.shadps4} "$@"
+        '';
+      };
       findRules = pkgs.writeText "retro-es-find-rules.xml" ''
         <?xml version="1.0"?>
         <ruleList>
@@ -297,7 +314,10 @@
             lib.mapAttrsToList (name: package: ''
               <emulator name="${name}">
               <rule type="staticpath"><entry>${
-                lib.getExe (if name == "XENIA" then xenia else package)
+                if name == "EDEN" then
+                  lib.getExe' package "eden-cli"
+                else
+                  lib.getExe (if name == "XENIA" then xenia else package)
               }</entry></rule>
               </emulator>
             '') nativeEmulators
@@ -329,13 +349,24 @@
             beetle-lynx
             beetle-ngp
             beetle-wswan
+            atari800
+            gearcoleco
+            freeintv
+            o2em
+            vecx
+            opera
+            virtualjaguar
+            beetle-pcfx
+            same_cdi
+            mame
+            beetle-vb
             mgba
             mupen64plus
           ];
           description = "RetroArch cores installed with the retro environment.";
         };
         standalone.enable =
-          lib.mkEnableOption "additional native PS2, Xbox, DS, PSP, PS3, Xbox 360, Wii U and 3DS emulators"
+          lib.mkEnableOption "additional native emulators through Switch, Vita and experimental PS4"
           // {
             default = true;
           };
@@ -360,7 +391,11 @@
             dolphin
           ]
           ++ lib.attrValues nativeEmulators
-          ++ lib.optional config.hon.retro.standalone.enable xenia;
+          ++ lib.optionals config.hon.retro.standalone.enable [
+            xenia
+            pkgs.vita3k
+            pkgs.shadps4
+          ];
         # Dolphin ships upstream USB access rules for the Wii U GameCube adapter.
         services.udev.packages = [ pkgs.dolphin-emu ];
         home-manager.users.${config.hon.user.username} = {

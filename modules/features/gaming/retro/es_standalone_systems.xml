@@ -6,6 +6,27 @@
   <platform>ps2</platform><theme>ps2</theme>
 </system>
 <system>
+  <name>switch</name><fullname>Nintendo Switch</fullname>
+  <path>%ROMPATH%/switch</path>
+  <extension>.nsp .NSP .xci .XCI .nro .NRO .nso .NSO</extension>
+  <command label="Eden (Native SDL)">%EMULATOR_EDEN% -f -g %ROM%</command>
+  <platform>switch</platform><theme>switch</theme>
+</system>
+<system>
+  <name>psvita</name><fullname>Sony PlayStation Vita</fullname>
+  <path>%ROMPATH%/psvita</path>
+  <extension>.psvita .PSVITA</extension>
+  <command label="Vita3K Installed Title (Experimental)">%EMULATOR_VITA3K% %ROM%</command>
+  <platform>psvita</platform><theme>psvita</theme>
+</system>
+<system>
+  <name>ps4</name><fullname>Sony PlayStation 4</fullname>
+  <path>%ROMPATH%/ps4</path>
+  <extension>.ps4dir .PS4DIR .elf .ELF</extension>
+  <command label="shadPS4 Unpacked Game (Experimental)">%EMULATOR_SHADPS4% %ROM%</command>
+  <platform>ps4</platform><theme>ps4</theme>
+</system>
+<system>
   <name>xbox</name><fullname>Microsoft Xbox</fullname>
   <path>%ROMPATH%/xbox</path>
   <extension>.iso .ISO .xiso .XISO</extension>

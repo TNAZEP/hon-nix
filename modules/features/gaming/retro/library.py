@@ -12,6 +12,21 @@ import xml.etree.ElementTree as ET
 
 # Folder aliases, not private library paths. Explicit mappings take precedence.
 ALIASES = {
+    "switch": ["switch", "Switch", "SWITCH"],
+    "psvita": ["psvita", "PSVITA", "Vita", "PS Vita"],
+    "ps4": ["ps4", "PS4", "PlayStation 4"],
+    "atari5200": ["atari5200", "Atari 5200", "A5200"],
+    "colecovision": ["colecovision", "ColecoVision", "Coleco"],
+    "intellivision": ["intellivision", "Intellivision", "INTV"],
+    "odyssey2": ["odyssey2", "Odyssey2", "Videopac"],
+    "vectrex": ["vectrex", "Vectrex", "VECTREX"],
+    "3do": ["3do", "3DO"],
+    "atarijaguar": ["atarijaguar", "Atari Jaguar", "Jaguar"],
+    "pcfx": ["pcfx", "PC-FX", "PCFX"],
+    "cdimono1": ["cdimono1", "CD-i", "CDI"],
+    "mame": ["mame", "MAME"],
+    "sg-1000": ["sg-1000", "SG-1000", "SG1000"],
+    "virtualboy": ["virtualboy", "Virtual Boy", "VB"],
     "psx": ["psx", "PSX", "PS1", "PlayStation"],
     "saturn": ["saturn", "Saturn", "SATURN"],
     "dreamcast": ["dreamcast", "Dreamcast", "DC"],
@@ -51,6 +66,9 @@ ALIASES = {
     "wiiu": ["wiiu", "WiiU", "Wii U", "WIIU"],
     "n3ds": ["n3ds", "N3DS", "3DS"],
 }
+# Canonical ES-DE names work in either lowercase or uppercase for every route.
+ALIASES = {system: list(dict.fromkeys([system, system.upper(), *aliases]))
+           for system, aliases in ALIASES.items()}
 
 
 def paths():
@@ -113,21 +131,26 @@ def update_links(view, selected, previous, manifest):
     write_json(manifest, previous | selected)
 
 
-def ps3_entries(source):
+def directory_entries(source, system):
+    layouts = {
+        "ps3": ("PS3_GAME/PARAM.SFO", "PS3_GAME/USRDIR/EBOOT.BIN"),
+        "ps4": ("sce_sys/param.sfo", "eboot.bin"),
+    }
+    suffix = f".{system}dir"
     def disc_dump(path):
-        return (path / "PS3_GAME/PARAM.SFO").is_file() and (path / "PS3_GAME/USRDIR/EBOOT.BIN").is_file()
+        return all((path / name).is_file() for name in layouts[system])
 
     candidates = [source] if disc_dump(source) else sorted(source.iterdir())
     selected = {}
     for path in candidates:
         if path.is_dir() and disc_dump(path):
-            name = path.name if path.suffix.lower() == ".ps3dir" else path.name + ".ps3dir"
-        elif path.is_file() and path.suffix.lower() == ".iso":
+            name = path.name if path.suffix.lower() == suffix else path.name + suffix
+        elif path.is_file() and path.suffix.lower() == (".iso" if system == "ps3" else ".elf"):
             name = path.name
         else:
             continue
         if name in selected:
-            raise ValueError(f"Ambiguous PS3 entry: {name}")
+            raise ValueError(f"Ambiguous {system.upper()} entry: {name}")
         selected[name] = str(path.resolve())
     return selected
 
@@ -151,24 +174,25 @@ def refresh(settings):
             selected[system] = str(matches[0].resolve())
     manifest = data / "library-view.json"
     previous = json.loads(manifest.read_text()) if manifest.exists() else {}
-    ps3_plan = None
-    if "ps3" in selected:
-        source = Path(selected["ps3"])
-        ps3_view = data / "ps3"
-        # Reject recursive source roots before inspecting their directory entries.
-        validate_links(ps3_view, {}, {})
-        validate_source(ps3_view, source)
+    directory_plans = []
+    for system in ("ps3", "ps4"):
+        if system not in selected:
+            continue
+        source = Path(selected[system])
+        directory_view = data / system
+        # Validate every managed view before inspecting or creating any links.
+        validate_links(directory_view, {}, {})
+        validate_source(directory_view, source)
         validate_source(view, source)
-        ps3_manifest = data / "ps3-view.json"
-        ps3_previous = json.loads(ps3_manifest.read_text()) if ps3_manifest.exists() else {}
-        ps3_selected = ps3_entries(source)
-        validate_links(ps3_view, ps3_selected, ps3_previous)
-        ps3_plan = (ps3_view, ps3_selected, ps3_previous, ps3_manifest)
-        selected["ps3"] = str(ps3_view.resolve())
-    # Validate both levels before creating any links. Never replace foreign entries.
+        directory_manifest = data / f"{system}-view.json"
+        directory_previous = json.loads(directory_manifest.read_text()) if directory_manifest.exists() else {}
+        directory_selected = directory_entries(source, system)
+        validate_links(directory_view, directory_selected, directory_previous)
+        directory_plans.append((directory_view, directory_selected, directory_previous, directory_manifest))
+        selected[system] = str(directory_view.resolve())
     validate_links(view, selected, previous)
-    if ps3_plan:
-        update_links(*ps3_plan)
+    for plan in directory_plans:
+        update_links(*plan)
     update_links(view, selected, previous, manifest)
     return view
 

@@ -201,3 +201,96 @@
   <command label="Beetle WonderSwan (Unfiltered)">%EMULATOR_RETROARCH% --presentation raw -L %CORE_RETROARCH%/mednafen_wswan_libretro.so %ROM%</command>
   <platform>wonderswancolor</platform><theme>wonderswancolor</theme>
 </system>
+<system>
+  <name>atari5200</name><fullname>Atari 5200</fullname>
+  <path>%ROMPATH%/atari5200</path>
+  <extension>.a52 .A52 .bin .BIN .car .CAR .zip .ZIP .7z .7Z</extension>
+  <command label="Atari800 (CRT)">%EMULATOR_RETROARCH% --presentation crt -L %CORE_RETROARCH%/atari800_libretro.so %ROM%</command>
+  <command label="Atari800 (Unfiltered)">%EMULATOR_RETROARCH% --presentation raw -L %CORE_RETROARCH%/atari800_libretro.so %ROM%</command>
+  <platform>atari5200</platform><theme>atari5200</theme>
+</system>
+<system>
+  <name>colecovision</name><fullname>ColecoVision</fullname>
+  <path>%ROMPATH%/colecovision</path>
+  <extension>.col .COL .cv .CV .bin .BIN .rom .ROM .zip .ZIP .7z .7Z</extension>
+  <command label="Gearcoleco (CRT)">%EMULATOR_RETROARCH% --presentation crt -L %CORE_RETROARCH%/gearcoleco_libretro.so %ROM%</command>
+  <command label="Gearcoleco (Unfiltered)">%EMULATOR_RETROARCH% --presentation raw -L %CORE_RETROARCH%/gearcoleco_libretro.so %ROM%</command>
+  <platform>colecovision</platform><theme>colecovision</theme>
+</system>
+<system>
+  <name>intellivision</name><fullname>Mattel Intellivision</fullname>
+  <path>%ROMPATH%/intellivision</path>
+  <extension>.int .INT .bin .BIN .rom .ROM .zip .ZIP .7z .7Z</extension>
+  <command label="FreeIntv (CRT)">%EMULATOR_RETROARCH% --presentation crt -L %CORE_RETROARCH%/freeintv_libretro.so %ROM%</command>
+  <command label="FreeIntv (Unfiltered)">%EMULATOR_RETROARCH% --presentation raw -L %CORE_RETROARCH%/freeintv_libretro.so %ROM%</command>
+  <platform>intellivision</platform><theme>intellivision</theme>
+</system>
+<system>
+  <name>odyssey2</name><fullname>Magnavox Odyssey2 / Videopac</fullname>
+  <path>%ROMPATH%/odyssey2</path>
+  <extension>.bin .BIN .zip .ZIP .7z .7Z</extension>
+  <command label="O2EM (CRT)">%EMULATOR_RETROARCH% --presentation crt -L %CORE_RETROARCH%/o2em_libretro.so %ROM%</command>
+  <command label="O2EM (Unfiltered)">%EMULATOR_RETROARCH% --presentation raw -L %CORE_RETROARCH%/o2em_libretro.so %ROM%</command>
+  <platform>odyssey2</platform><theme>odyssey2</theme>
+</system>
+<system>
+  <name>vectrex</name><fullname>GCE Vectrex</fullname>
+  <path>%ROMPATH%/vectrex</path>
+  <extension>.bin .BIN .vec .VEC .zip .ZIP .7z .7Z</extension>
+  <command label="vecx (Unfiltered)">%EMULATOR_RETROARCH% --presentation raw -L %CORE_RETROARCH%/vecx_libretro.so %ROM%</command>
+  <platform>vectrex</platform><theme>vectrex</theme>
+</system>
+<system>
+  <name>3do</name><fullname>3DO</fullname>
+  <path>%ROMPATH%/3do</path>
+  <extension>.iso .ISO .chd .CHD .cue .CUE</extension>
+  <command label="Opera (CRT)">%EMULATOR_RETROARCH% --presentation crt -L %CORE_RETROARCH%/opera_libretro.so %ROM%</command>
+  <command label="Opera (Unfiltered)">%EMULATOR_RETROARCH% --presentation raw -L %CORE_RETROARCH%/opera_libretro.so %ROM%</command>
+  <platform>3do</platform><theme>3do</theme>
+</system>
+<system>
+  <name>atarijaguar</name><fullname>Atari Jaguar</fullname>
+  <path>%ROMPATH%/atarijaguar</path>
+  <extension>.j64 .J64 .jag .JAG .rom .ROM .abs .ABS .cof .COF .bin .BIN .prg .PRG .zip .ZIP .7z .7Z</extension>
+  <command label="Virtual Jaguar (CRT)">%EMULATOR_RETROARCH% --presentation crt -L %CORE_RETROARCH%/virtualjaguar_libretro.so %ROM%</command>
+  <command label="Virtual Jaguar (Unfiltered)">%EMULATOR_RETROARCH% --presentation raw -L %CORE_RETROARCH%/virtualjaguar_libretro.so %ROM%</command>
+  <platform>atarijaguar</platform><theme>atarijaguar</theme>
+</system>
+<system>
+  <name>pcfx</name><fullname>NEC PC-FX</fullname>
+  <path>%ROMPATH%/pcfx</path>
+  <extension>.cue .CUE .ccd .CCD .toc .TOC .chd .CHD</extension>
+  <command label="Beetle PC-FX (CRT)">%EMULATOR_RETROARCH% --presentation crt -L %CORE_RETROARCH%/mednafen_pcfx_libretro.so %ROM%</command>
+  <command label="Beetle PC-FX (Unfiltered)">%EMULATOR_RETROARCH% --presentation raw -L %CORE_RETROARCH%/mednafen_pcfx_libretro.so %ROM%</command>
+  <platform>pcfx</platform><theme>pcfx</theme>
+</system>
+<system>
+  <name>cdimono1</name><fullname>Philips CD-i</fullname>
+  <path>%ROMPATH%/cdimono1</path>
+  <extension>.chd .CHD .iso .ISO .cue .CUE</extension>
+  <command label="SAME CDi (CRT)">%EMULATOR_RETROARCH% --presentation crt -L %CORE_RETROARCH%/same_cdi_libretro.so %ROM%</command>
+  <command label="SAME CDi (Unfiltered)">%EMULATOR_RETROARCH% --presentation raw -L %CORE_RETROARCH%/same_cdi_libretro.so %ROM%</command>
+  <platform>cdimono1</platform><theme>cdimono1</theme>
+</system>
+<system>
+  <name>mame</name><fullname>Arcade - MAME</fullname>
+  <path>%ROMPATH%/mame</path>
+  <extension>.zip .ZIP .7z .7Z .cmd .CMD</extension>
+  <command label="MAME (Unfiltered)">%EMULATOR_RETROARCH% --presentation raw -L %CORE_RETROARCH%/mame_libretro.so %ROM%</command>
+  <platform>arcade</platform><theme>mame</theme>
+</system>
+<system>
+  <name>sg-1000</name><fullname>Sega SG-1000</fullname>
+  <path>%ROMPATH%/sg-1000</path>
+  <extension>.sg .SG .zip .ZIP .7z .7Z</extension>
+  <command label="Genesis Plus GX (CRT)">%EMULATOR_RETROARCH% --presentation crt -L %CORE_RETROARCH%/genesis_plus_gx_libretro.so %ROM%</command>
+  <command label="Genesis Plus GX (Unfiltered)">%EMULATOR_RETROARCH% --presentation raw -L %CORE_RETROARCH%/genesis_plus_gx_libretro.so %ROM%</command>
+  <platform>sg-1000</platform><theme>sg-1000</theme>
+</system>
+<system>
+  <name>virtualboy</name><fullname>Nintendo Virtual Boy</fullname>
+  <path>%ROMPATH%/virtualboy</path>
+  <extension>.vb .VB .vboy .VBOY .bin .BIN .zip .ZIP .7z .7Z</extension>
+  <command label="Beetle VB (Unfiltered)">%EMULATOR_RETROARCH% --presentation raw -L %CORE_RETROARCH%/mednafen_vb_libretro.so %ROM%</command>
+  <platform>virtualboy</platform><theme>virtualboy</theme>
+</system>

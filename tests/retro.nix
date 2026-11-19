@@ -38,6 +38,7 @@ pkgs.runCommand "hon-retro-library-checks"
   }
   ''
     python ${./retro.py} ${../modules/features/gaming/retro/library.py}
+    python ${./retro-native.py} ${../modules/features/gaming/retro/native.py}
     python ${./retro-audit.py} ${../modules/features/gaming/retro/audit.py}
     python ${./retro-dat.py} ${../modules/features/gaming/retro/audit.py}
     python ${./retro-achievements.py} ${../modules/features/gaming/retro/achievements.py}
