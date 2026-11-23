@@ -1,8 +1,14 @@
 {
   flake.nixosModules.hyprlandMonitors =
-    { config, lib, ... }:
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
     let
       monitors = config.hon.monitors;
+      primaryMonitor = lib.findFirst (monitor: monitor.primary) (builtins.head monitors) monitors;
       ordered = builtins.filter (m: m.primary) monitors ++ builtins.filter (m: !m.primary) monitors;
       workspaces = lib.concatLists (
         lib.imap0 (
@@ -32,6 +38,12 @@
       config = {
         hon.workspaces = workspaces;
         home-manager.users.${config.hon.user.username}.wayland.windowManager.hyprland = {
+          # Wine/X11 games need an explicit primary output to choose its display modes.
+          extraConfig = ''
+            hl.on("hyprland.start", function()
+              hl.exec_cmd(${builtins.toJSON "${lib.getExe pkgs.xrandr} --output ${lib.escapeShellArg primaryMonitor.name} --primary"})
+            end)
+          '';
           settings = {
             monitor = map (
               m:

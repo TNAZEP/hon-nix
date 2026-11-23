@@ -9,6 +9,7 @@
       mpv
       yt-dlp
       (pkgs.callPackage ../../../pkgs/capture-view.nix { })
+      freetube
     ];
   };
 }
